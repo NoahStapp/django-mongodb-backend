@@ -1,0 +1,16 @@
+from django.db import models
+
+from benchmarking.common.models import Author
+
+
+class BookOneToOne(models.Model):
+    title = models.CharField(max_length=100)
+    author = models.OneToOneField(Author, on_delete=models.CASCADE)
+
+class BookOneToMany(models.Model):
+    title = models.CharField(max_length=100)
+    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+
+class BookManyToMany(models.Model):
+    title = models.CharField(max_length=100)
+    author = models.ManyToManyField(Author)

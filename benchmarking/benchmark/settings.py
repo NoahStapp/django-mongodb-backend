@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "common.apps.CommonConfig",
-    "one_to_one.apps.OneToOneConfig",
+    "filter_operations.apps.FilterOperationsConfig",
 ]
 
 MIDDLEWARE = [

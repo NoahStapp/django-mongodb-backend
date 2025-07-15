@@ -17,8 +17,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+from benchmarking.filter_operations.views import populate_data, benchmark_filter_operations, clear_data
+
 urlpatterns = [
-    path("populate_data_one_to_one/", include("one_to_one.urls"), name="populate_data_one_to_one"),
-    path("filter_by_exact_match/", include("one_to_one.urls"), name="filter_by_exact_match"),
+    path("filter_operations/populate_data/<int:n>/<str:data_type>", populate_data,
+         name="populate_data"),
+    path("filter_operations/benchmark_filter_operations/<str:data_type>", benchmark_filter_operations, name="benchmark_filter_operations"),
+    path("clear_data/", clear_data, name="clear_data"),
     path("admin/", admin.site.urls),
 ]

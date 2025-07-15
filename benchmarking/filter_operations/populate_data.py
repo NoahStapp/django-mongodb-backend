@@ -5,6 +5,12 @@ import random
 from benchmarking.common.models import Author
 from benchmarking.filter_operations.models import BookOneToOne, BookOneToMany, BookManyToMany
 
+GENRES = [
+            "Action", "Comedy", "Drama", "Fantasy", "Horror",
+            "Mystery", "Romance", "Sci-Fi", "Thriller", "Western",
+            "Adventure", "Animation", "Crime", "Documentary", "Family",
+            "History", "Musical", "Sports",
+        ]
 
 class DataGenerator:
     """  
@@ -13,12 +19,6 @@ class DataGenerator:
 
     def __init__(self):
         self.fake = Faker()
-        self.genres = [
-            "Action", "Comedy", "Drama", "Fantasy", "Horror",
-            "Mystery", "Romance", "Sci-Fi", "Thriller", "Western",
-            "Adventure", "Animation", "Crime", "Documentary", "Family",
-            "History", "Musical", "Sports",
-        ]
 
     def create_one_to_one_data(self, n):
         """  
@@ -35,7 +35,7 @@ class DataGenerator:
                 BookOneToOne.objects.create(
                     title=self.fake.sentence(),
                     author=author,
-                    genre=self.fake.random_element(self.genres),
+                    genre=self.fake.random_element(GENRES),
                     publish_date=self.fake.date(),
                 )
 
@@ -55,7 +55,7 @@ class DataGenerator:
                     BookOneToMany.objects.create(
                         title=self.fake.sentence(),
                         author=author,
-                        genre=self.fake.random_element(self.genres),
+                        genre=self.fake.random_element(GENRES),
                         publish_date=self.fake.date()
                     )
                     num_books += 1
@@ -77,7 +77,7 @@ class DataGenerator:
                         break
                     BookManyToMany.objects.create(
                         title=self.fake.sentence(),
-                        genre=self.fake.random_element(self.genres),
+                        genre=self.fake.random_element(GENRES),
                         publish_date=self.fake.date(),
                         author=authors,
                     )

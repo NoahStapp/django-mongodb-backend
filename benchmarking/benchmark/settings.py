@@ -33,12 +33,12 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    # "benchmark.apps.MongoAdminConfig",
-    # "benchmark.apps.MongoAuthConfig",
-    # "benchmark.apps.MongoContentTypesConfig",
-    "django.contrib.admin",
-    "django.contrib.auth",
-    "django.contrib.contenttypes",
+    "benchmark.apps.MongoAdminConfig",
+    "benchmark.apps.MongoAuthConfig",
+    "benchmark.apps.MongoContentTypesConfig",
+    # "django.contrib.admin",
+    # "django.contrib.auth",
+    # "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
@@ -79,15 +79,15 @@ WSGI_APPLICATION = "benchmark.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-# DATABASES = {
-#     "default": django_mongodb_backend.parse_uri("mongodb://localhost:27017/benchmark"),
-# }
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / "db.sqlite3",
-    }
+    "default": django_mongodb_backend.parse_uri("mongodb://localhost:27017/benchmark"),
 }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / "db.sqlite3",
+#     }
+# }
 
 # Database routers
 # https://docs.djangoproject.com/en/dev/ref/settings/#database-routers
@@ -132,8 +132,8 @@ STATIC_URL = "static/"
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
-# DEFAULT_AUTO_FIELD = "django_mongodb_backend.fields.ObjectIdAutoField"
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+DEFAULT_AUTO_FIELD = "django_mongodb_backend.fields.ObjectIdAutoField"
+# DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 MIGRATION_MODULES = {
     "admin": "mongo_migrations.admin",

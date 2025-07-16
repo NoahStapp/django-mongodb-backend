@@ -1,0 +1,72 @@
+{
+  "filter_by_exact_match": {
+    "p50 query execution time": 0.001,
+    "p75 query execution time": 0.001,
+    "p90 query execution time": 0.001,
+    "p99 query execution time": 0.0019000000000000004,
+    "Throughput": "361.7796709667416 ops/s",
+    "Latency": "0.0030702124000526964 seconds",
+    "CPU Utilization": "93.65%",
+    "Memory Usage": "0.20996761322021484 MB (peak)"
+  },
+  "filter_by_partial_match": {
+    "p50 query execution time": 0.002,
+    "p75 query execution time": 0.002,
+    "p90 query execution time": 0.002,
+    "p99 query execution time": 0.002,
+    "Throughput": "267.6368565423454 ops/s",
+    "Latency": "0.003888400100549916 seconds",
+    "CPU Utilization": "76.71%",
+    "Memory Usage": "0.05863199234008789 MB (peak)"
+  },
+  "filter_by_date_range": {
+    "p50 query execution time": 0.0015,
+    "p75 query execution time": 0.002,
+    "p90 query execution time": 0.002,
+    "p99 query execution time": 0.002,
+    "Throughput": "62.61392754324694 ops/s",
+    "Latency": "0.015981737599213376 seconds",
+    "CPU Utilization": "94.55%",
+    "Memory Usage": "0.293017578125 MB (peak)"
+  },
+  "filter_by_complex_filters": {
+    "p50 query execution time": 0.001,
+    "p75 query execution time": 0.001,
+    "p90 query execution time": 0.0010999999999999996,
+    "p99 query execution time": 0.0019100000000000002,
+    "Throughput": "346.2288356127964 ops/s",
+    "Latency": "0.0029146164015401155 seconds",
+    "CPU Utilization": "87.42%",
+    "Memory Usage": "0.04162454605102539 MB (peak)"
+  },
+  "filter_by_exact_match_fk": {
+    "p50 query execution time": 0.028,
+    "p75 query execution time": 0.029,
+    "p90 query execution time": 0.03,
+    "p99 query execution time": 0.035,
+    "Throughput": "33.9573401480522 ops/s",
+    "Latency": "29.469380929299952 seconds",
+    "CPU Utilization": "7.17%",
+    "Memory Usage": "1.0546537399291993 MB (peak)"
+  },
+  "filter_by_partial_match_fk": {
+    "p50 query execution time": 0.03,
+    "p75 query execution time": 0.031,
+    "p90 query execution time": 0.032,
+    "p99 query execution time": 0.034,
+    "Throughput": "31.97691470730327 ops/s",
+    "Latency": "31.312290620799466 seconds",
+    "CPU Utilization": "10.71%",
+    "Memory Usage": "1.0341794967651368 MB (peak)"
+  },
+  "filter_by_complex_filters_fk": {
+    "p50 query execution time": 0.004,
+    "p75 query execution time": 0.004,
+    "p90 query execution time": 0.004,
+    "p99 query execution time": 0.004,
+    "Throughput": "213.88542945961666 ops/s",
+    "Latency": "4.6774073498985675 seconds",
+    "CPU Utilization": "39.55%",
+    "Memory Usage": "0.5919967651367187 MB (peak)"
+  }
+}

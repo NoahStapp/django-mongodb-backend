@@ -75,12 +75,12 @@ class DataGenerator:
                 for _ in range(random.randint(1, 10)):
                     if num_books >= n:
                         break
-                    BookManyToMany.objects.create(
+                    book = BookManyToMany.objects.create(
                         title=self.fake.sentence(),
                         genre=self.fake.random_element(GENRES),
                         publish_date=self.fake.date(),
-                        author=authors,
                     )
+                    book.author.set(authors)
                     num_books += 1
 
         print(f"Successfully created {num_books} books with their authors!")

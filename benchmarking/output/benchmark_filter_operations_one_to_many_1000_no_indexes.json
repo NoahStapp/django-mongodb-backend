@@ -1,0 +1,58 @@
+{
+  "filter_by_exact_match": {
+    "p50 query execution time": 0.002,
+    "p75 query execution time": 0.002,
+    "p90 query execution time": 0.003,
+    "p99 query execution time": 0.003,
+    "Throughput": "391.01537791231635 ops/s",
+    "Latency": "0.0029509333005989903 seconds"
+  },
+  "filter_by_partial_match": {
+    "p50 query execution time": 0.002,
+    "p75 query execution time": 0.002,
+    "p90 query execution time": 0.002,
+    "p99 query execution time": 0.002,
+    "Throughput": "398.82312066056704 ops/s",
+    "Latency": "0.0025701833990751767 seconds"
+  },
+  "filter_by_date_range": {
+    "p50 query execution time": 0.001,
+    "p75 query execution time": 0.001,
+    "p90 query execution time": 0.001,
+    "p99 query execution time": 0.001,
+    "Throughput": "266.511568154354 ops/s",
+    "Latency": "0.0037801246988237837 seconds"
+  },
+  "filter_by_complex_filters": {
+    "p50 query execution time": 0.001,
+    "p75 query execution time": 0.001,
+    "p90 query execution time": 0.001,
+    "p99 query execution time": 0.001,
+    "Throughput": "1017.6642082291589 ops/s",
+    "Latency": "0.0009869999004877173 seconds"
+  },
+  "filter_by_exact_match_fk": {
+    "p50 query execution time": 0.029,
+    "p75 query execution time": 0.03,
+    "p90 query execution time": 0.031,
+    "p99 query execution time": 0.05071000000000003,
+    "Throughput": "33.429586131530336 ops/s",
+    "Latency": "5.187717087499914 seconds"
+  },
+  "filter_by_partial_match_fk": {
+    "p50 query execution time": 0.03,
+    "p75 query execution time": 0.031,
+    "p90 query execution time": 0.032,
+    "p99 query execution time": 0.04071000000000004,
+    "Throughput": "32.97469974964558 ops/s",
+    "Latency": "5.253144458401948 seconds"
+  },
+  "filter_by_complex_filters_fk": {
+    "p50 query execution time": 0.03,
+    "p75 query execution time": 0.03,
+    "p90 query execution time": 0.031,
+    "p99 query execution time": 0.049,
+    "Throughput": "33.06748094371473 ops/s",
+    "Latency": "5.242776708400197 seconds"
+  }
+}

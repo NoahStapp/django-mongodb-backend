@@ -1,0 +1,58 @@
+{
+  "filter_by_exact_match": {
+    "p50 query execution time": 0.001,
+    "p75 query execution time": 0.001,
+    "p90 query execution time": 0.001,
+    "p99 query execution time": 0.001,
+    "Throughput": "974.6133590078755 ops/s",
+    "Latency": "0.0011346125997079072 seconds"
+  },
+  "filter_by_partial_match": {
+    "p50 query execution time": 0.001,
+    "p75 query execution time": 0.001,
+    "p90 query execution time": 0.001,
+    "p99 query execution time": 0.001,
+    "Throughput": "587.1111082762575 ops/s",
+    "Latency": "0.001716466699144803 seconds"
+  },
+  "filter_by_date_range": {
+    "p50 query execution time": 0.001,
+    "p75 query execution time": 0.001,
+    "p90 query execution time": 0.001,
+    "p99 query execution time": 0.001,
+    "Throughput": "253.85544979006332 ops/s",
+    "Latency": "0.003957583198643988 seconds"
+  },
+  "filter_by_complex_filters": {
+    "p50 query execution time": 0.001,
+    "p75 query execution time": 0.001,
+    "p90 query execution time": 0.001,
+    "p99 query execution time": 0.001,
+    "Throughput": "765.8684649462361 ops/s",
+    "Latency": "0.0013238417981483509 seconds"
+  },
+  "filter_by_exact_match_fk": {
+    "p50 query execution time": 0.031,
+    "p75 query execution time": 0.032,
+    "p90 query execution time": 0.033,
+    "p99 query execution time": 0.043,
+    "Throughput": "31.68949629274121 ops/s",
+    "Latency": "31.574330495999313 seconds"
+  },
+  "filter_by_partial_match_fk": {
+    "p50 query execution time": 0.032,
+    "p75 query execution time": 0.034,
+    "p90 query execution time": 0.035,
+    "p99 query execution time": 0.052020000000000434,
+    "Throughput": "29.82687180686649 ops/s",
+    "Latency": "33.53566768739911 seconds"
+  },
+  "filter_by_complex_filters_fk": {
+    "p50 query execution time": 0.03,
+    "p75 query execution time": 0.032,
+    "p90 query execution time": 0.033,
+    "p99 query execution time": 0.048,
+    "Throughput": "32.14701290057674 ops/s",
+    "Latency": "31.156813579198932 seconds"
+  }
+}

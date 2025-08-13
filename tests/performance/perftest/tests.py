@@ -4,19 +4,19 @@ import time
 import warnings
 from typing import List
 
+from bson import encode
 from django.forms import model_to_dict
 from django.test import (
     TestCase,
 )
-from django.test.utils import isolate_apps
 
-from .models import SmallFlatModel
+from .models import SmallFlatModel, ForeignKeyModel, SmallFlatModelFk, LargeFlatModel
 
 OUTPUT_FILE = os.environ.get("OUTPUT_FILE")
 
-NUM_ITERATIONS = 100
-MIN_ITERATION_TIME = 60
-MAX_ITERATION_TIME = 300
+NUM_ITERATIONS = 10
+MIN_ITERATION_TIME = 30
+MAX_ITERATION_TIME = 60
 NUM_DOCS = 10000
 
 result_data: List = []
@@ -119,8 +119,7 @@ class PerformanceTest:
         self.results = results
 
 
-
-class SmallFlatModelTests(PerformanceTest, TestCase):
+class SmallDocTest(PerformanceTest):
     dataset = "small_doc.json"
 
     def setUp(self):
@@ -128,18 +127,117 @@ class SmallFlatModelTests(PerformanceTest, TestCase):
         with open(self.dataset, "r") as data:
             self.document = json.load(data)
 
-        field_names = [field.name for field in SmallFlatModel._meta.get_fields() if field.name != "id"]
-        values = self.document.values()
-        model = SmallFlatModel()
-        for field_name, value in zip(field_names, values):
-            setattr(model, field_name, value)
-        model.save()
+        self.data_size = len(encode(self.document)) * NUM_DOCS
+        self.field_names = [field.name for field in SmallFlatModel._meta.get_fields() if field.name not in ["id", "field_fk"]]
+        self.documents = [self.document.copy() for _ in range(NUM_DOCS)]
 
-    def testTest(self):
-        print("woo!")
+class TestSmallDocCreation(SmallDocTest, TestCase):
+    def do_task(self):
+        for doc in self.documents:
+            model = SmallFlatModel()
+            for field_name, value in zip(self.field_names, doc.values()):
+                setattr(model, field_name, value)
+            model.save()
 
+    def after(self):
+        SmallFlatModel.objects.all().delete()
 
+class TestSmallDocUpdate(SmallDocTest, TestCase):
+    def setUp(self):
+        super().setUp()
+        for doc in self.documents:
+            model = SmallFlatModel()
+            for field_name, value in zip(self.field_names, doc.values()):
+                setattr(model, field_name, value)
+            model.save()
+        self.models = list(SmallFlatModel.objects.all())
+        self.data_size = len(encode({"field1": "updated_value"})) * NUM_DOCS
 
+    def do_task(self):
+        for model in self.models:
+            model.field1 = "updated_value"
+            model.save()
 
+    def after(self):
+        SmallFlatModel.objects.all().delete()
 
+class TestSmallDocFilterById(SmallDocTest, TestCase):
+    def setUp(self):
+        super().setUp()
+        self.ids = []
+        for doc in self.documents:
+            model = SmallFlatModel()
+            for field_name, value in zip(self.field_names, doc.values()):
+                setattr(model, field_name, value)
+            model.save()
+            self.ids.append(model.id)
+
+    def do_task(self):
+        for _id in self.ids:
+            list(SmallFlatModel.objects.filter(id=_id))
+
+    def tearDown(self):
+        super().tearDown()
+        SmallFlatModel.objects.all().delete()
+
+class TestSmallDocFilterByForeignKey(SmallDocTest, TestCase):
+    def setUp(self):
+        super().setUp()
+        self.fks = []
+        for doc in self.documents:
+            model = SmallFlatModelFk()
+            for field_name, value in zip(self.field_names, doc.values()):
+                if field_name == "field_fk":
+                    continue
+                setattr(model, field_name, value)
+            foreign_key_model = ForeignKeyModel.objects.create(name="foreign_key_name")
+            self.fks.append(foreign_key_model)
+            foreign_key_model.save()
+            setattr(model, "field_fk", foreign_key_model)
+            model.save()
+
+    def do_task(self):
+        for fk in self.fks:
+            list(SmallFlatModelFk.objects.filter(field_fk__id=fk.id))
+
+    def tearDown(self):
+        super().tearDown()
+        SmallFlatModelFk.objects.all().delete()
+
+class LargeDocTest(PerformanceTest):
+    dataset = "large_doc.json"
+
+    def setUp(self):
+        super().setUp()
+        with open(self.dataset, "r") as data:
+            self.document = json.load(data)
+
+        self.data_size = len(encode(self.document)) * NUM_DOCS
+        self.documents = [self.document.copy() for _ in range(NUM_DOCS)]
+
+class TestLargeDocCreation(LargeDocTest, TestCase):
+    def do_task(self):
+        for doc in self.documents:
+            model = LargeFlatModel(**doc)
+            model.save()
+
+    def after(self):
+        LargeFlatModel.objects.all().delete()
+
+class TestLargeDocUpdate(LargeDocTest, TestCase):
+    def setUp(self):
+        super().setUp()
+        for doc in self.documents:
+            model = LargeFlatModel(**doc)
+            model.save()
+        self.models = list(LargeFlatModel.objects.all())
+        self.data_size = len(encode({"field1": "updated_value"})) * NUM_DOCS
+
+    def do_task(self):
+        for model in self.models:
+            model.field1 = "updated_value"
+            model.save()
+
+    def after(self):
+        LargeFlatModel.objects.all().delete()
 

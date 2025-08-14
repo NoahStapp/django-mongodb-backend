@@ -2,14 +2,21 @@ import json
 import os
 import time
 import warnings
-from typing import List
 
-from bson import encode, ObjectId
+from bson import ObjectId, encode
 from django.test import (
     TestCase,
 )
 
-from .models import SmallFlatModel, ForeignKeyModel, SmallFlatModelFk, LargeFlatModel, LargeNestedModel, StringEmbeddedModel, IntegerEmbeddedModel
+from .models import (
+    ForeignKeyModel,
+    IntegerEmbeddedModel,
+    LargeFlatModel,
+    LargeNestedModel,
+    SmallFlatModel,
+    SmallFlatModelFk,
+    StringEmbeddedModel,
+)
 
 OUTPUT_FILE = os.environ.get("OUTPUT_FILE")
 
@@ -18,7 +25,8 @@ MIN_ITERATION_TIME = 30
 MAX_ITERATION_TIME = 60
 NUM_DOCS = 10000
 
-result_data: List = []
+result_data: list = []
+
 
 def tearDownModule():
     output = json.dumps(result_data, indent=4)
@@ -28,6 +36,7 @@ def tearDownModule():
     else:
         print(output)
 
+
 class Timer:
     def __enter__(self):
         self.start = time.monotonic()
@@ -36,6 +45,7 @@ class Timer:
     def __exit__(self, *args):
         self.end = time.monotonic()
         self.interval = self.end - self.start
+
 
 # Copied from the driver benchmarking suite.
 class PerformanceTest:
@@ -88,9 +98,8 @@ class PerformanceTest:
             sorted_results = sorted(self.results)
             percentile_index = int(len(sorted_results) * percentile / 100) - 1
             return sorted_results[percentile_index]
-        else:
-            self.fail("Test execution failed")
-            return None
+        self.fail("Test execution failed")
+        return None
 
     def runTest(self):
         results = []
@@ -123,11 +132,12 @@ class SmallFlatDocTest(PerformanceTest):
 
     def setUp(self):
         super().setUp()
-        with open(self.dataset, "r") as data:
+        with open(self.dataset) as data:
             self.document = json.load(data)
 
         self.data_size = len(encode(self.document)) * NUM_DOCS
         self.documents = [self.document.copy() for _ in range(NUM_DOCS)]
+
 
 class TestSmallFlatDocCreation(SmallFlatDocTest, TestCase):
     def do_task(self):
@@ -137,6 +147,7 @@ class TestSmallFlatDocCreation(SmallFlatDocTest, TestCase):
 
     def after(self):
         SmallFlatModel.objects.all().delete()
+
 
 class TestSmallFlatDocUpdate(SmallFlatDocTest, TestCase):
     def setUp(self):
@@ -155,6 +166,7 @@ class TestSmallFlatDocUpdate(SmallFlatDocTest, TestCase):
     def after(self):
         SmallFlatModel.objects.all().delete()
 
+
 class TestSmallFlatDocFilterById(SmallFlatDocTest, TestCase):
     def setUp(self):
         super().setUp()
@@ -171,6 +183,7 @@ class TestSmallFlatDocFilterById(SmallFlatDocTest, TestCase):
     def tearDown(self):
         super().tearDown()
         SmallFlatModel.objects.all().delete()
+
 
 class TestSmallFlatDocFilterByForeignKey(SmallFlatDocTest, TestCase):
     def setUp(self):
@@ -192,16 +205,18 @@ class TestSmallFlatDocFilterByForeignKey(SmallFlatDocTest, TestCase):
         super().tearDown()
         SmallFlatModelFk.objects.all().delete()
 
+
 class LargeFlatDocTest(PerformanceTest):
     dataset = "large_doc.json"
 
     def setUp(self):
         super().setUp()
-        with open(self.dataset, "r") as data:
+        with open(self.dataset) as data:
             self.document = json.load(data)
 
         self.data_size = len(encode(self.document)) * NUM_DOCS
         self.documents = [self.document.copy() for _ in range(NUM_DOCS)]
+
 
 class TestLargeFlatDocCreation(LargeFlatDocTest, TestCase):
     def do_task(self):
@@ -211,6 +226,7 @@ class TestLargeFlatDocCreation(LargeFlatDocTest, TestCase):
 
     def after(self):
         LargeFlatModel.objects.all().delete()
+
 
 class TestLargeFlatDocUpdate(LargeFlatDocTest, TestCase):
     def setUp(self):
@@ -229,12 +245,13 @@ class TestLargeFlatDocUpdate(LargeFlatDocTest, TestCase):
     def after(self):
         LargeFlatModel.objects.all().delete()
 
+
 class LargeNestedDocTest(PerformanceTest):
     dataset = "large_doc_nested.json"
 
     def setUp(self):
         super().setUp()
-        with open(self.dataset, "r") as data:
+        with open(self.dataset) as data:
             self.document = json.load(data)
 
         self.data_size = len(encode(self.document)) * NUM_DOCS
@@ -261,12 +278,14 @@ class LargeNestedDocTest(PerformanceTest):
                     setattr(model, k, embedded_int_model)
             model.save()
 
+
 class TestLargeNestedDocCreation(LargeNestedDocTest, TestCase):
     def do_task(self):
         self.create_model()
 
     def after(self):
         LargeNestedModel.objects.all().delete()
+
 
 class TestLargeNestedDocUpdate(LargeNestedDocTest, TestCase):
     def setUp(self):
@@ -283,11 +302,14 @@ class TestLargeNestedDocUpdate(LargeNestedDocTest, TestCase):
             model.embedded_str_doc_1.field1 = "updated_value"
             model.save()
 
+
 class TestLargeNestedDocFilterById(LargeNestedDocTest, TestCase):
     def setUp(self):
         super().setUp()
         self.create_model()
-        self.ids = [model.embedded_str_doc_1.unique_id for model in list(LargeNestedModel.objects.all())]
+        self.ids = [
+            model.embedded_str_doc_1.unique_id for model in list(LargeNestedModel.objects.all())
+        ]
 
     def do_task(self):
         for _id in self.ids:
@@ -297,11 +319,15 @@ class TestLargeNestedDocFilterById(LargeNestedDocTest, TestCase):
         super().tearDown()
         LargeNestedModel.objects.all().delete()
 
+
 class TestLargeNestedDocFilterArray(LargeNestedDocTest, TestCase):
     def setUp(self):
         super().setUp()
         self.create_model()
-        self.ids = [model.embedded_str_doc_array[0].unique_id for model in list(LargeNestedModel.objects.all())]
+        self.ids = [
+            model.embedded_str_doc_array[0].unique_id
+            for model in list(LargeNestedModel.objects.all())
+        ]
 
     def do_task(self):
         for _id in self.ids:
@@ -310,5 +336,3 @@ class TestLargeNestedDocFilterArray(LargeNestedDocTest, TestCase):
     def tearDown(self):
         super().tearDown()
         LargeNestedModel.objects.all().delete()
-
-

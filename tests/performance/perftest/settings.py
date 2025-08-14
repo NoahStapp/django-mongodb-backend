@@ -30,12 +30,9 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
-INSTALLED_APPS = [
-    "perftest"
-]
+INSTALLED_APPS = ["perftest"]
 
-MIDDLEWARE = [
-]
+MIDDLEWARE = []
 
 TEMPLATES = [
     {

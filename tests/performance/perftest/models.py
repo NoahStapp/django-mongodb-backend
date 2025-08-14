@@ -1,7 +1,8 @@
 from django.db import models
 
-from django_mongodb_backend.fields import EmbeddedModelField, EmbeddedModelArrayField, ObjectIdField
+from django_mongodb_backend.fields import EmbeddedModelArrayField, EmbeddedModelField, ObjectIdField
 from django_mongodb_backend.models import EmbeddedModel
+
 
 class SmallFlatModel(models.Model):
     field1 = models.CharField(max_length=100)
@@ -18,8 +19,10 @@ class SmallFlatModel(models.Model):
     field12 = models.IntegerField()
     field13 = models.IntegerField()
 
+
 class ForeignKeyModel(models.Model):
     name = models.CharField(max_length=100)
+
 
 class SmallFlatModelFk(models.Model):
     field1 = models.CharField(max_length=100)
@@ -36,6 +39,7 @@ class SmallFlatModelFk(models.Model):
     field12 = models.IntegerField()
     field13 = models.IntegerField()
     field_fk = models.ForeignKey(ForeignKeyModel, on_delete=models.DO_NOTHING)
+
 
 class LargeFlatModel(models.Model):
     field1 = models.CharField(max_length=100)
@@ -308,6 +312,7 @@ class StringEmbeddedModel(EmbeddedModel):
     field14 = models.CharField(max_length=100)
     field15 = models.CharField(max_length=100)
 
+
 class IntegerEmbeddedModel(EmbeddedModel):
     unique_id = ObjectIdField()
     field1 = models.IntegerField()
@@ -325,6 +330,7 @@ class IntegerEmbeddedModel(EmbeddedModel):
     field13 = models.IntegerField()
     field14 = models.IntegerField()
     field15 = models.IntegerField()
+
 
 class LargeNestedModel(models.Model):
     embedded_str_doc_1 = EmbeddedModelField(StringEmbeddedModel)

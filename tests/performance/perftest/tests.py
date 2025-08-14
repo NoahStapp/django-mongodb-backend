@@ -4,13 +4,12 @@ import time
 import warnings
 from typing import List
 
-from bson import encode
-from django.forms import model_to_dict
+from bson import encode, ObjectId
 from django.test import (
     TestCase,
 )
 
-from .models import SmallFlatModel, ForeignKeyModel, SmallFlatModelFk, LargeFlatModel
+from .models import SmallFlatModel, ForeignKeyModel, SmallFlatModelFk, LargeFlatModel, LargeNestedModel, StringEmbeddedModel, IntegerEmbeddedModel
 
 OUTPUT_FILE = os.environ.get("OUTPUT_FILE")
 
@@ -119,7 +118,7 @@ class PerformanceTest:
         self.results = results
 
 
-class SmallDocTest(PerformanceTest):
+class SmallFlatDocTest(PerformanceTest):
     dataset = "small_doc.json"
 
     def setUp(self):
@@ -128,27 +127,22 @@ class SmallDocTest(PerformanceTest):
             self.document = json.load(data)
 
         self.data_size = len(encode(self.document)) * NUM_DOCS
-        self.field_names = [field.name for field in SmallFlatModel._meta.get_fields() if field.name not in ["id", "field_fk"]]
         self.documents = [self.document.copy() for _ in range(NUM_DOCS)]
 
-class TestSmallDocCreation(SmallDocTest, TestCase):
+class TestSmallFlatDocCreation(SmallFlatDocTest, TestCase):
     def do_task(self):
         for doc in self.documents:
-            model = SmallFlatModel()
-            for field_name, value in zip(self.field_names, doc.values()):
-                setattr(model, field_name, value)
+            model = SmallFlatModel(**doc)
             model.save()
 
     def after(self):
         SmallFlatModel.objects.all().delete()
 
-class TestSmallDocUpdate(SmallDocTest, TestCase):
+class TestSmallFlatDocUpdate(SmallFlatDocTest, TestCase):
     def setUp(self):
         super().setUp()
         for doc in self.documents:
-            model = SmallFlatModel()
-            for field_name, value in zip(self.field_names, doc.values()):
-                setattr(model, field_name, value)
+            model = SmallFlatModel(**doc)
             model.save()
         self.models = list(SmallFlatModel.objects.all())
         self.data_size = len(encode({"field1": "updated_value"})) * NUM_DOCS
@@ -161,14 +155,12 @@ class TestSmallDocUpdate(SmallDocTest, TestCase):
     def after(self):
         SmallFlatModel.objects.all().delete()
 
-class TestSmallDocFilterById(SmallDocTest, TestCase):
+class TestSmallFlatDocFilterById(SmallFlatDocTest, TestCase):
     def setUp(self):
         super().setUp()
         self.ids = []
         for doc in self.documents:
-            model = SmallFlatModel()
-            for field_name, value in zip(self.field_names, doc.values()):
-                setattr(model, field_name, value)
+            model = SmallFlatModel(**doc)
             model.save()
             self.ids.append(model.id)
 
@@ -180,20 +172,16 @@ class TestSmallDocFilterById(SmallDocTest, TestCase):
         super().tearDown()
         SmallFlatModel.objects.all().delete()
 
-class TestSmallDocFilterByForeignKey(SmallDocTest, TestCase):
+class TestSmallFlatDocFilterByForeignKey(SmallFlatDocTest, TestCase):
     def setUp(self):
         super().setUp()
         self.fks = []
         for doc in self.documents:
-            model = SmallFlatModelFk()
-            for field_name, value in zip(self.field_names, doc.values()):
-                if field_name == "field_fk":
-                    continue
-                setattr(model, field_name, value)
+            model = SmallFlatModelFk(**doc)
             foreign_key_model = ForeignKeyModel.objects.create(name="foreign_key_name")
             self.fks.append(foreign_key_model)
             foreign_key_model.save()
-            setattr(model, "field_fk", foreign_key_model)
+            model.field_fk = foreign_key_model
             model.save()
 
     def do_task(self):
@@ -204,7 +192,7 @@ class TestSmallDocFilterByForeignKey(SmallDocTest, TestCase):
         super().tearDown()
         SmallFlatModelFk.objects.all().delete()
 
-class LargeDocTest(PerformanceTest):
+class LargeFlatDocTest(PerformanceTest):
     dataset = "large_doc.json"
 
     def setUp(self):
@@ -215,7 +203,7 @@ class LargeDocTest(PerformanceTest):
         self.data_size = len(encode(self.document)) * NUM_DOCS
         self.documents = [self.document.copy() for _ in range(NUM_DOCS)]
 
-class TestLargeDocCreation(LargeDocTest, TestCase):
+class TestLargeFlatDocCreation(LargeFlatDocTest, TestCase):
     def do_task(self):
         for doc in self.documents:
             model = LargeFlatModel(**doc)
@@ -224,7 +212,7 @@ class TestLargeDocCreation(LargeDocTest, TestCase):
     def after(self):
         LargeFlatModel.objects.all().delete()
 
-class TestLargeDocUpdate(LargeDocTest, TestCase):
+class TestLargeFlatDocUpdate(LargeFlatDocTest, TestCase):
     def setUp(self):
         super().setUp()
         for doc in self.documents:
@@ -240,4 +228,87 @@ class TestLargeDocUpdate(LargeDocTest, TestCase):
 
     def after(self):
         LargeFlatModel.objects.all().delete()
+
+class LargeNestedDocTest(PerformanceTest):
+    dataset = "large_doc_nested.json"
+
+    def setUp(self):
+        super().setUp()
+        with open(self.dataset, "r") as data:
+            self.document = json.load(data)
+
+        self.data_size = len(encode(self.document)) * NUM_DOCS
+        self.documents = [self.document.copy() for _ in range(NUM_DOCS)]
+
+    def create_model(self):
+        for doc in self.documents:
+            model = LargeNestedModel()
+            for k, v in doc.items():
+                if "array" in k:
+                    array_models = []
+                    for item in v:
+                        embedded_str_model = StringEmbeddedModel(**item)
+                        embedded_str_model.unique_id = ObjectId()
+                        array_models.append(embedded_str_model)
+                    setattr(model, k, array_models)
+                elif "str" in k:
+                    embedded_str_model = StringEmbeddedModel(**v)
+                    embedded_str_model.unique_id = ObjectId()
+                    setattr(model, k, embedded_str_model)
+                else:
+                    embedded_int_model = IntegerEmbeddedModel(**v)
+                    embedded_int_model.unique_id = ObjectId()
+                    setattr(model, k, embedded_int_model)
+            model.save()
+
+class TestLargeNestedDocCreation(LargeNestedDocTest, TestCase):
+    def do_task(self):
+        self.create_model()
+
+    def after(self):
+        LargeNestedModel.objects.all().delete()
+
+class TestLargeNestedDocUpdate(LargeNestedDocTest, TestCase):
+    def setUp(self):
+        super().setUp()
+        self.create_model()
+        self.models = list(LargeNestedModel.objects.all())
+        self.data_size = len(encode({"field1": "updated_value"})) * NUM_DOCS
+
+    def after(self):
+        LargeNestedModel.objects.all().delete()
+
+    def do_task(self):
+        for model in self.models:
+            model.embedded_str_doc_1.field1 = "updated_value"
+            model.save()
+
+class TestLargeNestedDocFilterById(LargeNestedDocTest, TestCase):
+    def setUp(self):
+        super().setUp()
+        self.create_model()
+        self.ids = [model.embedded_str_doc_1.unique_id for model in list(LargeNestedModel.objects.all())]
+
+    def do_task(self):
+        for _id in self.ids:
+            list(LargeNestedModel.objects.filter(embedded_str_doc_1__unique_id=_id))
+
+    def tearDown(self):
+        super().tearDown()
+        LargeNestedModel.objects.all().delete()
+
+class TestLargeNestedDocFilterArray(LargeNestedDocTest, TestCase):
+    def setUp(self):
+        super().setUp()
+        self.create_model()
+        self.ids = [model.embedded_str_doc_array[0].unique_id for model in list(LargeNestedModel.objects.all())]
+
+    def do_task(self):
+        for _id in self.ids:
+            list(LargeNestedModel.objects.filter(embedded_str_doc_array__unique_id__in=[_id]))
+
+    def tearDown(self):
+        super().tearDown()
+        LargeNestedModel.objects.all().delete()
+
 

@@ -21,9 +21,9 @@ from .models import (
 OUTPUT_FILE = os.environ.get("OUTPUT_FILE")
 
 NUM_ITERATIONS = 10
-MIN_ITERATION_TIME = 5
-MAX_ITERATION_TIME = 10
-NUM_DOCS = 10
+MIN_ITERATION_TIME = 30
+MAX_ITERATION_TIME = 60
+NUM_DOCS = 10000
 
 result_data: list = []
 

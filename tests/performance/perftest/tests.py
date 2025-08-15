@@ -31,10 +31,10 @@ result_data: list = []
 def tearDownModule():
     output = json.dumps(result_data, indent=4)
     if OUTPUT_FILE:
-        with open(OUTPUT_FILE, "w") as opf:
+        with open(OUTPUT_FILE, "w") as opf:  # noqa: PTH123
             opf.write(output)
     else:
-        print(output)
+        print(output)  # noqa: T201
 
 
 class Timer:
@@ -61,8 +61,9 @@ class PerformanceTest:
         name = self.__class__.__name__[4:]
         median = self.percentile(50)
         megabytes_per_sec = self.data_size / median / 1000000
-        print(
-            f"Completed {self.__class__.__name__} {megabytes_per_sec:.3f} MB/s, MEDIAN={self.percentile(50):.3f}s, "
+        print(  # noqa: T201
+            f"Completed {self.__class__.__name__} {megabytes_per_sec:.3f} MB/s, "
+            f"MEDIAN={self.percentile(50):.3f}s, "
             f"total time={duration:.3f}s, iterations={len(self.results)}"
         )
         result_data.append(
@@ -119,7 +120,9 @@ class PerformanceTest:
                 with warnings.catch_warnings():
                     warnings.simplefilter("default")
                     warnings.warn(
-                        f"{self.__class__.__name__} timed out after {MAX_ITERATION_TIME}s, completed {i}/{NUM_ITERATIONS} iterations."
+                        f"{self.__class__.__name__} timed out after {MAX_ITERATION_TIME}s, "
+                        f"completed {i}/{NUM_ITERATIONS} iterations.",
+                        stacklevel=2,
                     )
 
                 break
@@ -132,7 +135,7 @@ class SmallFlatDocTest(PerformanceTest):
 
     def setUp(self):
         super().setUp()
-        with open(self.dataset) as data:
+        with open(self.dataset) as data:  # noqa: PTH123
             self.document = json.load(data)
 
         self.data_size = len(encode(self.document)) * NUM_DOCS
@@ -204,6 +207,7 @@ class TestSmallFlatDocFilterByForeignKey(SmallFlatDocTest, TestCase):
     def tearDown(self):
         super().tearDown()
         SmallFlatModelFk.objects.all().delete()
+        ForeignKeyModel.objects.all().delete()
 
 
 class LargeFlatDocTest(PerformanceTest):
@@ -211,7 +215,7 @@ class LargeFlatDocTest(PerformanceTest):
 
     def setUp(self):
         super().setUp()
-        with open(self.dataset) as data:
+        with open(self.dataset) as data:  # noqa: PTH123
             self.document = json.load(data)
 
         self.data_size = len(encode(self.document)) * NUM_DOCS
@@ -251,7 +255,7 @@ class LargeNestedDocTest(PerformanceTest):
 
     def setUp(self):
         super().setUp()
-        with open(self.dataset) as data:
+        with open(self.dataset) as data:  # noqa: PTH123
             self.document = json.load(data)
 
         self.data_size = len(encode(self.document)) * NUM_DOCS

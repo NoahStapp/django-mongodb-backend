@@ -1,7 +1,45 @@
+# Copyright 2025-present MongoDB, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Tests for the MongoDB ODM Performance Benchmark Spec.
+
+See https://github.com/mongodb/specifications/blob/master/source/benchmarking/odm-benchmarking.md
+
+
+To set up the benchmarks locally::
+    git clone --depth 1 https://github.com/mongodb/specifications.git
+    pushd specifications/source/benchmarking/odm-data
+    tar xf flat_models.tgz
+    tar xf nested_models.tgz
+    popd
+    export TEST_PATH="specifications/source/benchmarking/odm-data"
+    export OUTPUT_FILE="results.json"
+
+Then to run all benchmarks quickly::
+    cd tests/performance
+    FASTBENCH=1 python manage.py test
+
+To run individual benchmarks quickly::
+    cd tests/performance
+    FASTBENCH=1 python manage.py test perftest.tests.TestLargeNestedDocFilterArray
+"""
+
 import json
 import os
 import time
 import warnings
+from pathlib import Path
 
 from bson import ObjectId, encode
 from django.test import (
@@ -20,10 +58,18 @@ from .models import (
 
 OUTPUT_FILE = os.environ.get("OUTPUT_FILE")
 
-NUM_ITERATIONS = 10
-MIN_ITERATION_TIME = 30
-MAX_ITERATION_TIME = 60
-NUM_DOCS = 10000
+if os.environ.get("FASTBENCH"):
+    NUM_ITERATIONS = 1
+    MIN_ITERATION_TIME = 5
+    MAX_ITERATION_TIME = 10
+    NUM_DOCS = 1000
+else:
+    NUM_ITERATIONS = 10
+    MIN_ITERATION_TIME = 30
+    MAX_ITERATION_TIME = 60
+    NUM_DOCS = 10000
+
+TEST_PATH = os.environ.get("TEST_PATH", Path(os.path.realpath(__file__)).parent.parent / "odm-data")
 
 result_data: list = []
 
@@ -135,7 +181,7 @@ class SmallFlatDocTest(PerformanceTest):
 
     def setUp(self):
         super().setUp()
-        with open(self.dataset) as data:  # noqa: PTH123
+        with open(Path(TEST_PATH) / Path("flat_models") / self.dataset) as data:  # noqa: PTH123
             self.document = json.load(data)
 
         self.data_size = len(encode(self.document)) * NUM_DOCS
@@ -215,7 +261,7 @@ class LargeFlatDocTest(PerformanceTest):
 
     def setUp(self):
         super().setUp()
-        with open(self.dataset) as data:  # noqa: PTH123
+        with open(Path(TEST_PATH) / Path("flat_models") / self.dataset) as data:  # noqa: PTH123
             self.document = json.load(data)
 
         self.data_size = len(encode(self.document)) * NUM_DOCS
@@ -255,7 +301,7 @@ class LargeNestedDocTest(PerformanceTest):
 
     def setUp(self):
         super().setUp()
-        with open(self.dataset) as data:  # noqa: PTH123
+        with open(Path(TEST_PATH) / Path("nested_models") / self.dataset) as data:  # noqa: PTH123
             self.document = json.load(data)
 
         self.data_size = len(encode(self.document)) * NUM_DOCS
@@ -298,13 +344,13 @@ class TestLargeNestedDocUpdate(LargeNestedDocTest, TestCase):
         self.models = list(LargeNestedModel.objects.all())
         self.data_size = len(encode({"field1": "updated_value"})) * NUM_DOCS
 
-    def after(self):
-        LargeNestedModel.objects.all().delete()
-
     def do_task(self):
         for model in self.models:
             model.embedded_str_doc_1.field1 = "updated_value"
             model.save()
+
+    def after(self):
+        LargeNestedModel.objects.all().delete()
 
 
 class TestLargeNestedDocFilterById(LargeNestedDocTest, TestCase):

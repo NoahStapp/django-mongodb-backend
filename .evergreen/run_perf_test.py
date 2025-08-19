@@ -26,7 +26,7 @@ def handle_perf(start_time: datetime):
         "end": int(end_time.timestamp()),
         "elapsed": elapsed_secs,
     }
-    report = {"failures": 0, "results": [results]}
+    report = {"results": [results]}
 
     LOGGER.info("report.json\n%s", json.dumps(report, indent=2))
 

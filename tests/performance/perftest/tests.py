@@ -66,7 +66,7 @@ if os.environ.get("FASTBENCH"):
 else:
     NUM_ITERATIONS = 10
     MIN_ITERATION_TIME = 30
-    MAX_ITERATION_TIME = 60
+    MAX_ITERATION_TIME = 120
     NUM_DOCS = 10000
 
 TEST_PATH = os.environ.get("TEST_PATH", Path(os.path.realpath(__file__)).parent.parent / "odm-data")
@@ -205,14 +205,16 @@ class TestSmallFlatDocUpdate(SmallFlatDocTest, TestCase):
             model = SmallFlatModel(**doc)
             model.save()
         self.models = list(SmallFlatModel.objects.all())
-        self.data_size = len(encode({"field1": "updated_value"})) * NUM_DOCS
+        self.data_size = len(encode({"field1": "updated_value0"})) * NUM_DOCS
+        self.iteration = 0
 
     def do_task(self):
         for model in self.models:
-            model.field1 = "updated_value"
+            model.field1 = "updated_value" + str(self.iteration)
             model.save()
+        self.iteration += 1
 
-    def after(self):
+    def tearDown(self):
         SmallFlatModel.objects.all().delete()
 
 
@@ -285,14 +287,16 @@ class TestLargeFlatDocUpdate(LargeFlatDocTest, TestCase):
             model = LargeFlatModel(**doc)
             model.save()
         self.models = list(LargeFlatModel.objects.all())
-        self.data_size = len(encode({"field1": "updated_value"})) * NUM_DOCS
+        self.data_size = len(encode({"field1": "updated_value0"})) * NUM_DOCS
+        self.iteration = 0
 
     def do_task(self):
         for model in self.models:
-            model.field1 = "updated_value"
+            model.field1 = "updated_value" + str(self.iteration)
             model.save()
+        self.iteration += 1
 
-    def after(self):
+    def tearDown(self):
         LargeFlatModel.objects.all().delete()
 
 
@@ -342,14 +346,16 @@ class TestLargeNestedDocUpdate(LargeNestedDocTest, TestCase):
         super().setUp()
         self.create_model()
         self.models = list(LargeNestedModel.objects.all())
-        self.data_size = len(encode({"field1": "updated_value"})) * NUM_DOCS
+        self.data_size = len(encode({"field1": "updated_value0"})) * NUM_DOCS
+        self.iteration = 0
 
     def do_task(self):
         for model in self.models:
-            model.embedded_str_doc_1.field1 = "updated_value"
+            model.embedded_str_doc_1.field1 = "updated_value" + str(self.iteration)
             model.save()
+        self.iteration += 1
 
-    def after(self):
+    def tearDown(self):
         LargeNestedModel.objects.all().delete()
 
 

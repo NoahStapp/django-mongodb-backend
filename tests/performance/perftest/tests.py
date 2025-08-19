@@ -191,8 +191,7 @@ class SmallFlatDocTest(PerformanceTest):
 class TestSmallFlatDocCreation(SmallFlatDocTest, TestCase):
     def do_task(self):
         for doc in self.documents:
-            model = SmallFlatModel(**doc)
-            model.save()
+            SmallFlatModel.objects.create(**doc)
 
     def after(self):
         SmallFlatModel.objects.all().delete()
@@ -202,8 +201,7 @@ class TestSmallFlatDocUpdate(SmallFlatDocTest, TestCase):
     def setUp(self):
         super().setUp()
         for doc in self.documents:
-            model = SmallFlatModel(**doc)
-            model.save()
+            SmallFlatModel.objects.create(**doc)
         self.models = list(SmallFlatModel.objects.all())
         self.data_size = len(encode({"field1": "updated_value0"})) * NUM_DOCS
         self.iteration = 0
@@ -223,8 +221,7 @@ class TestSmallFlatDocFilterById(SmallFlatDocTest, TestCase):
         super().setUp()
         self.ids = []
         for doc in self.documents:
-            model = SmallFlatModel(**doc)
-            model.save()
+            model = SmallFlatModel.objects.create(**doc)
             self.ids.append(model.id)
 
     def do_task(self):
@@ -273,8 +270,7 @@ class LargeFlatDocTest(PerformanceTest):
 class TestLargeFlatDocCreation(LargeFlatDocTest, TestCase):
     def do_task(self):
         for doc in self.documents:
-            model = LargeFlatModel(**doc)
-            model.save()
+            LargeFlatModel.objects.create(**doc)
 
     def after(self):
         LargeFlatModel.objects.all().delete()
@@ -284,8 +280,7 @@ class TestLargeFlatDocUpdate(LargeFlatDocTest, TestCase):
     def setUp(self):
         super().setUp()
         for doc in self.documents:
-            model = LargeFlatModel(**doc)
-            model.save()
+            LargeFlatModel.objects.create(**doc)
         self.models = list(LargeFlatModel.objects.all())
         self.data_size = len(encode({"field1": "updated_value0"})) * NUM_DOCS
         self.iteration = 0

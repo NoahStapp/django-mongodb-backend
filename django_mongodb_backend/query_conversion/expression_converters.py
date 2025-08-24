@@ -14,21 +14,24 @@ class _BaseExpressionConverter:
     @classmethod
     def is_simple_value(cls, value):
         """
-        Check if the value is a simple type (not a list or dict).
+        Check if the value is a simple type (not a dict).
         """
-        return isinstance(value, (str, int, float, bool)) or value is None
+        if isinstance(value, str) and value.startswith("$"):
+            return False
+        if isinstance(value, list | tuple | set):
+            return all(cls.is_simple_value(v) for v in value)
+        # TODO: Expand functionality to support `$getField` conversion
+        return not isinstance(value, dict) or value is None
 
     @classmethod
     def is_convertable_field_name(cls, field_name):
         """Validate a field_name is one that can be represented in $match"""
         # This needs work and re-evaluation
-        if (
+        return (
             isinstance(field_name, str)
             and field_name.startswith("$")
             and not field_name[:1].isalnum()
-        ):
-            return True
-        return False
+        )
 
 
 class _EqExpressionConverter(_BaseExpressionConverter):
@@ -62,7 +65,7 @@ class _InExpressionConverter(_BaseExpressionConverter):
             # Check if first argument is a simple field reference
             if isinstance(field_expr, str) and field_expr.startswith("$"):
                 field_name = field_expr[1:]  # Remove the $ prefix
-                if isinstance(values, list) and all(
+                if isinstance(values, list | tuple | set) and all(
                     cls.is_simple_value(v) for v in values
                 ):
                     return {field_name: {"$in": values}}

@@ -123,7 +123,7 @@ def convert_expression(expr):
         Optimized match condition or None if not optimizable
     """
     if isinstance(expr, dict) and len(expr) == 1:
-        op = list(expr.keys())[0]
+        op = next(iter(expr.keys()))
         if op in OPTIMIZABLE_OPS:
             return OPTIMIZABLE_OPS[op].optimize(expr[op])
     return None

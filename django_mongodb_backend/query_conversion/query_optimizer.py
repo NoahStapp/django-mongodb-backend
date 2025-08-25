@@ -73,13 +73,10 @@ class QueryOptimizer:
             if not has_and and not has_or:
                 # Process single condition
                 optimized = convert_expression(expr)
-                print(f"{expr=}")
                 if optimized:
                     match_conditions.append({"$match": optimized})
                 else:
                     remaining_conditions.append(expr)
-                print(f"{match_conditions=}")
-                print(f"{remaining_conditions=}")
         else:
             # Can't optimize
             remaining_conditions.append(expr)

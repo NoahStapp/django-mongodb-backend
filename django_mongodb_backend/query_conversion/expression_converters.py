@@ -8,7 +8,7 @@ class _BaseExpressionConverter:
     """
 
     @classmethod
-    def optimize(cls, expr):
+    def convert(cls, expr):
         raise NotImplementedError("Subclasses should implement this method.")
 
     @classmethod
@@ -38,7 +38,7 @@ class _EqExpressionConverter(_BaseExpressionConverter):
     """Convert $eq operation to a $match compatible query."""
 
     @classmethod
-    def optimize(cls, eq_args):
+    def convert(cls, eq_args):
         if isinstance(eq_args, list) and len(eq_args) == 2:
             field_expr, value = eq_args
 
@@ -58,7 +58,7 @@ class _InExpressionConverter(_BaseExpressionConverter):
     """Convert $in operation to a $match compatible query."""
 
     @classmethod
-    def optimize(cls, in_args):
+    def convert(cls, in_args):
         if isinstance(in_args, list) and len(in_args) == 2:
             field_expr, values = in_args
 
@@ -77,7 +77,7 @@ class _LogicalExpressionConverter(_BaseExpressionConverter):
     """Generic for converting logical operations to a $match compatible query."""
 
     @classmethod
-    def optimize(cls, combined_conditions):
+    def convert(cls, combined_conditions):
         if isinstance(combined_conditions, list):
             optimized_conditions = []
             for condition in combined_conditions:
@@ -125,5 +125,5 @@ def convert_expression(expr):
     if isinstance(expr, dict) and len(expr) == 1:
         op = next(iter(expr.keys()))
         if op in OPTIMIZABLE_OPS:
-            return OPTIMIZABLE_OPS[op].optimize(expr[op])
+            return OPTIMIZABLE_OPS[op].convert(expr[op])
     return None

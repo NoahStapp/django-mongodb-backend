@@ -89,7 +89,7 @@ class MongoQuery:
         for query in self.subqueries or ():
             pipeline.extend(query.get_pipeline())
         if self.match_mql:
-            pipeline.append(QueryOptimizer().optimize(self.match_mql))
+            pipeline.extend(QueryOptimizer().convert_expr_to_match(self.match_mql))
         if self.aggregation_pipeline:
             pipeline.extend(self.aggregation_pipeline)
         if self.project_fields:

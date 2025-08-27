@@ -1,4 +1,4 @@
-from datetime import datetime
+import datetime
 from uuid import UUID
 
 from bson import Decimal128
@@ -11,11 +11,11 @@ class TestBaseExpressionConversionCase(SimpleTestCase):
     CONVERTIBLE_TYPES = {
         "int": 42,
         "float": 3.14,
-        "decimal128": Decimal128(3.14),
+        "decimal128": Decimal128("3.14"),
         "boolean": True,
         "NoneType": None,
         "string": "string",
-        "datetime": datetime.datetime.utcnow(),
+        "datetime": datetime.datetime.now(datetime.UTC),
         "duration": datetime.timedelta(days=5, hours=3),
         "uuid": UUID("12345678123456781234567812345678"),
     }
@@ -24,25 +24,26 @@ class TestBaseExpressionConversionCase(SimpleTestCase):
         result = convert_expression(input)
         self.assertEqual(result, expected)
 
+    def assertNotOptimizable(self, input):
+        result = convert_expression(input)
+        self.assertIsNone(result)
+
     def test_non_dict_expression(self):
         expr = ["$status", "active"]
-        expected = expr  # Should remain unchanged
-        self.assertConversionEqual(expr, expected)
+        self.assertNotOptimizable(expr)
 
     def test_empty_dict_expression(self):
         expr = {}
-        expected = expr  # Should remain unchanged
-        self.assertConversionEqual(expr, expected)
+        self.assertNotOptimizable(expr)
 
     def test_non_convertible(self):
         expr = {"$gt": ["$price", 100]}
-        expected = expr  # Should remain unchanged
-        self.assertConversionEqual(expr, expected)
+        self.assertNotOptimizable(expr)
 
     def _test_conversion_various_types(self, conversion_test):
         for _type, val in self.CONVERTIBLE_TYPES.items():
             with self.subTest(_type=_type, val=val):
-                self.conversion_test(val)
+                conversion_test(val)
 
 
 class TestEqExprConversionCase(TestBaseExpressionConversionCase):
@@ -51,15 +52,13 @@ class TestEqExprConversionCase(TestBaseExpressionConversionCase):
         expected = {"status": "active"}
         self.assertConversionEqual(expr, expected)
 
-    def test_eq_conversion_non_string_field(self):
+    def test_eq_no_conversion_non_string_field(self):
         expr = {"$eq": [123, "active"]}
-        expected = expr
-        self.assertConversionEqual(expr, expected)
+        self.assertNotOptimizable(expr)
 
     def test_eq_no_conversion_dict_value(self):
         expr = {"$eq": ["$status", {"$gt": 5}]}
-        expected = expr
-        self.assertConversionEqual(expr, expected)
+        self.assertNotOptimizable(expr)
 
     def _test_eq_conversion_valid_type(self, _type):
         expr = {"$eq": ["$age", _type]}
@@ -84,19 +83,30 @@ class TestInExprConversionCase(TestBaseExpressionConversionCase):
         expected = {"category": {"$in": ["electronics", "books", "clothing"]}}
         self.assertConversionEqual(expr, expected)
 
-    def test_in_conversion_non_string_field(self):
+    def test_in_no_conversion_non_string_field(self):
         expr = {"$in": [123, ["electronics", "books"]]}
-        expected = expr
-        self.assertConversionEqual(expr, expected)
+        self.assertNotOptimizable(expr)
 
     def test_in_no_conversion_dict_value(self):
         expr = {"$in": ["$status", [{"bad": "val"}]]}
-        expected = expr
-        self.assertConversionEqual(expr, expected)
+        self.assertNotOptimizable(expr)
 
     def _test_in_conversion_valid_type(self, _type):
-        expr = {"$in": ["$age", (_type,)]}
-        expected = {"age": _type}
+        expr = {
+            "$in": [
+                "$age",
+                [
+                    _type,
+                ],
+            ]
+        }
+        expected = {
+            "age": {
+                "$in": [
+                    _type,
+                ]
+            }
+        }
         self.assertConversionEqual(expr, expected)
 
     def test_in_conversion_various_types(self):
@@ -151,7 +161,7 @@ class TestLogicalExpressionConversionCase(TestBaseExpressionConversionCase):
                 },
             ]
         }
-        self.assertConversionEqual(expr, expr)
+        self.assertNotOptimizable(expr)
 
     def test_logical_mixed_conversion(self):
         expr = {
@@ -192,4 +202,4 @@ class TestLogicalExpressionConversionCase(TestBaseExpressionConversionCase):
                 {"$gt": ["$price", 50]},  # Not optimizable
             ]
         }
-        self.assertConversionEqual(expr, expr)
+        self.assertNotOptimizable(expr)

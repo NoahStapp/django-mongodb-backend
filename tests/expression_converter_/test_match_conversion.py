@@ -9,7 +9,7 @@ optimizer = QueryOptimizer()
 
 class QueryOptimizerTests(SimpleTestCase):
     def assertOptimizerEqual(self, input, expected):
-        result = QueryOptimizer().optimize(input)
+        result = QueryOptimizer().convert_expr_to_match(input)
         self.assertEqual(result, expected)
 
     def test_multiple_optimizable_conditions(self):
@@ -22,15 +22,17 @@ class QueryOptimizerTests(SimpleTestCase):
                 ]
             }
         }
-        expected = {
-            "$match": {
-                "$and": [
-                    {"status": "active"},
-                    {"category": {"$in": ["electronics", "books"]}},
-                    {"verified": True},
-                ]
+        expected = [
+            {
+                "$match": {
+                    "$and": [
+                        {"status": "active"},
+                        {"category": {"$in": ["electronics", "books"]}},
+                        {"verified": True},
+                    ]
+                }
             }
-        }
+        ]
         self.assertOptimizerEqual(expr, expected)
 
     def test_mixed_optimizable_and_non_optimizable_conditions(self):
@@ -43,21 +45,25 @@ class QueryOptimizerTests(SimpleTestCase):
                 ]
             }
         }
-        expected = {
-            "$match": {
-                "$and": [{"status": "active"}, {"category": {"$in": ["electronics"]}}],
-                "$expr": {"$gt": ["$price", 100]},
+        expected = [
+            {
+                "$match": {
+                    "$and": [{"status": "active"}, {"category": {"$in": ["electronics"]}}],
+                    "$expr": {"$gt": ["$price", 100]},
+                }
             }
-        }
+        ]
         self.assertOptimizerEqual(expr, expected)
 
     def test_non_optimizable_condition(self):
         expr = {"$expr": {"$gt": ["$price", 100]}}
-        expected = {
-            "$match": {
-                "$expr": {"$gt": ["$price", 100]},
+        expected = [
+            {
+                "$match": {
+                    "$expr": {"$gt": ["$price", 100]},
+                }
             }
-        }
+        ]
         self.assertOptimizerEqual(expr, expected)
 
     def test_nested_logical_conditions(self):
@@ -70,18 +76,14 @@ class QueryOptimizerTests(SimpleTestCase):
                 ]
             }
         }
-        expected = {
-            "$match": {
-                "$or": [
-                    {"status": "active"},
-                    {"category": {"$in": ["electronics", "books"]}},
-                ],
-                "$and": [
-                    {"verified": True},
-                    {"price": {"$gt": 50}},
-                ],
+        expected = [
+            {
+                "$match": {
+                    "$expr": {"$and": [{"$eq": ["$verified", True]}, {"$gt": ["$price", 50]}]},
+                    "$or": [{"status": "active"}, {"category": {"$in": ["electronics", "books"]}}],
+                }
             }
-        }
+        ]
         self.assertOptimizerEqual(expr, expected)
 
     def test_complex_nested_with_non_optimizable_parts(self):
@@ -100,30 +102,32 @@ class QueryOptimizerTests(SimpleTestCase):
                 ]
             }
         }
-        expected = {
-            "$match": {
-                "$and": [
-                    {"category": {"$in": ["electronics", "books"]}},
-                    {"verified": True},
-                ],
-                "$expr": {
+        expected = [
+            {
+                "$match": {
                     "$and": [
-                        {
-                            "$or": [
-                                {"$eq": ["$status", "active"]},
-                                {"$gt": ["$views", 1000]},
-                            ]
-                        },
-                        {"$gt": ["$price", 50]},
-                    ]
-                },
+                        {"category": {"$in": ["electronics", "books"]}},
+                        {"verified": True},
+                    ],
+                    "$expr": {
+                        "$and": [
+                            {
+                                "$or": [
+                                    {"$eq": ["$status", "active"]},
+                                    {"$gt": ["$views", 1000]},
+                                ]
+                            },
+                            {"$gt": ["$price", 50]},
+                        ]
+                    },
+                }
             }
-        }
+        ]
         self.assertOptimizerEqual(expr, expected)
 
     def test_london_in_case(self):
         expr = {"$expr": {"$in": ["$author_city", ["London"]]}}
-        expected = {"$match": {"author_city": {"$in": ["London"]}}}
+        expected = [{"$match": {"author_city": {"$in": ["London"]}}}]
         self.assertOptimizerEqual(expr, expected)
 
     def test_deeply_nested_logical_operators(self):
@@ -145,24 +149,26 @@ class QueryOptimizerTests(SimpleTestCase):
                 ]
             }
         }
-        expected = {
-            "$match": {
-                "$and": [
-                    {
-                        "$or": [
-                            {"type": "premium"},
-                            {
-                                "$and": [
-                                    {"type": "standard"},
-                                    {"region": {"$in": ["US", "CA"]}},
-                                ]
-                            },
-                        ]
-                    },
-                    {"active": True},
-                ]
+        expected = [
+            {
+                "$match": {
+                    "$and": [
+                        {
+                            "$or": [
+                                {"type": "premium"},
+                                {
+                                    "$and": [
+                                        {"type": "standard"},
+                                        {"region": {"$in": ["US", "CA"]}},
+                                    ]
+                                },
+                            ]
+                        },
+                        {"active": True},
+                    ]
+                }
             }
-        }
+        ]
         self.assertOptimizerEqual(expr, expected)
 
     def test_deeply_nested_logical_operator_with_variable(self):
@@ -185,22 +191,24 @@ class QueryOptimizerTests(SimpleTestCase):
                 ]
             }
         }
-        expected = {
-            "$match": {
-                "$expr": {
-                    "$and": [
-                        {"$eq": ["$type", "premium"]},
-                        {
-                            "$and": [
-                                {"$eq": ["$type", "$$standard"]},
-                                {"$in": ["$region", ["US", "CA"]]},
-                            ]
-                        },
-                    ]
-                },
-                "$and": [{"active": True}],
+        expected = [
+            {
+                "$match": {
+                    "$expr": {
+                        "$or": [
+                            {"$eq": ["$type", "premium"]},
+                            {
+                                "$and": [
+                                    {"$eq": ["$type", "$$standard"]},
+                                    {"$in": ["$region", ["US", "CA"]]},
+                                ]
+                            },
+                        ]
+                    },
+                    "$and": [{"active": True}],
+                }
             }
-        }
+        ]
         self.assertOptimizerEqual(expr, expected)
 
 
@@ -210,7 +218,8 @@ class OptimizedMatchMQLTests(TestCase):
             list(Author.objects.filter(author_city__in=["London"]))
         query = ctx.captured_queries[0]["sql"]
         expected = (
-            "db.queries__author.aggregate([{'$match': {'author_city': {'$in': ['London']}}}])"
+            "db.expression_converter__author.aggregate([{'$match': "
+            + "{'author_city': {'$in': ('London',)}}}])"
         )
         self.assertEqual(query, expected)
 
@@ -218,7 +227,7 @@ class OptimizedMatchMQLTests(TestCase):
         with self.assertNumQueries(1) as ctx:
             list(Author.objects.filter(name="Alice"))
         query = ctx.captured_queries[0]["sql"]
-        expected = "db.queries__author.aggregate([{'$match': {'name': 'Alice'}}])"
+        expected = "db.expression_converter__author.aggregate([{'$match': {'name': 'Alice'}}])"
         self.assertEqual(query, expected)
 
     def test_eq_and_in_query(self):
@@ -226,7 +235,7 @@ class OptimizedMatchMQLTests(TestCase):
             list(Author.objects.filter(name="Alice", author_city__in=["London", "New York"]))
         query = ctx.captured_queries[0]["sql"]
         expected = (
-            "db.queries__author.aggregate([{'$match': {'$and': [{'name': 'Alice'}, "
-            "{'author_city': {'$in': ['London', 'New York']}}]}}])"
+            "db.expression_converter__author.aggregate([{'$match': {'$and': "
+            + "[{'author_city': {'$in': ('London', 'New York')}}, {'name': 'Alice'}]}}])"
         )
         self.assertEqual(query, expected)

@@ -48,8 +48,11 @@ class QueryOptimizerTests(SimpleTestCase):
         expected = [
             {
                 "$match": {
-                    "$and": [{"status": "active"}, {"category": {"$in": ["electronics"]}}],
-                    "$expr": {"$gt": ["$price", 100]},
+                    "$and": [
+                        {"status": "active"},
+                        {"category": {"$in": ["electronics"]}},
+                        {"$expr": {"$gt": ["$price", 100]}},
+                    ],
                 }
             }
         ]
@@ -79,8 +82,15 @@ class QueryOptimizerTests(SimpleTestCase):
         expected = [
             {
                 "$match": {
-                    "$expr": {"$and": [{"$eq": ["$verified", True]}, {"$gt": ["$price", 50]}]},
-                    "$or": [{"status": "active"}, {"category": {"$in": ["electronics", "books"]}}],
+                    "$or": [
+                        {"status": "active"},
+                        {"category": {"$in": ["electronics", "books"]}},
+                        {
+                            "$expr": {
+                                "$and": [{"$eq": ["$verified", True]}, {"$gt": ["$price", 50]}]
+                            }
+                        },
+                    ]
                 }
             }
         ]
@@ -108,18 +118,16 @@ class QueryOptimizerTests(SimpleTestCase):
                     "$and": [
                         {"category": {"$in": ["electronics", "books"]}},
                         {"verified": True},
-                    ],
-                    "$expr": {
-                        "$and": [
-                            {
+                        {
+                            "$expr": {
                                 "$or": [
                                     {"$eq": ["$status", "active"]},
                                     {"$gt": ["$views", 1000]},
                                 ]
-                            },
-                            {"$gt": ["$price", 50]},
-                        ]
-                    },
+                            }
+                        },
+                        {"$expr": {"$gt": ["$price", 50]}},
+                    ]
                 }
             }
         ]
@@ -194,18 +202,22 @@ class QueryOptimizerTests(SimpleTestCase):
         expected = [
             {
                 "$match": {
-                    "$expr": {
-                        "$or": [
-                            {"$eq": ["$type", "premium"]},
-                            {
-                                "$and": [
-                                    {"$eq": ["$type", "$$standard"]},
-                                    {"$in": ["$region", ["US", "CA"]]},
+                    "$and": [
+                        {"active": True},
+                        {
+                            "$expr": {
+                                "$or": [
+                                    {"$eq": ["$type", "premium"]},
+                                    {
+                                        "$and": [
+                                            {"$eq": ["$type", "$$standard"]},
+                                            {"$in": ["$region", ["US", "CA"]]},
+                                        ]
+                                    },
                                 ]
-                            },
-                        ]
-                    },
-                    "$and": [{"active": True}],
+                            }
+                        },
+                    ]
                 }
             }
         ]

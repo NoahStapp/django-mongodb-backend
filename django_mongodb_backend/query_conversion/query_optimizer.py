@@ -24,15 +24,14 @@ class QueryOptimizer:
             return [{"$match": {}}]
 
         expr_content = expr_query["$expr"]
-        match_conditions = []
-        remaining_expr_conditions = []
 
         # Handle the expression content
-        self._process_expression(expr_content, match_conditions, remaining_expr_conditions)
+        match_conditions, remaining_expr_conditions = self._process_expression(expr_content)
 
         # If there are remaining conditions that couldn't be optimized,
         # keep them in an $expr
         if remaining_expr_conditions:
+            print(f"Remaining conditions: {remaining_expr_conditions}, match_conditions: {match_conditions}")
             if len(remaining_expr_conditions) == 1:
                 expr_conditions = {"$expr": remaining_expr_conditions[0]}
             else:
@@ -44,17 +43,18 @@ class QueryOptimizer:
             else:
                 match_conditions.append({"$match": expr_conditions})
 
+        print(f"Original expr: {expr_query}, optimized expr: {match_conditions}")
         return match_conditions
 
-    def _process_expression(self, expr, match_conditions, remaining_conditions):
+    def _process_expression(self, expr):
         """
         Process an expression and extract optimizable conditions.
 
         Args:
             expr: The expression to process
-            match_conditions: List to append optimized match conditions
-            remaining_conditions: List to append non-optimizable conditions
         """
+        match_conditions = []
+        remaining_conditions = []
         if isinstance(expr, dict):
             # Check if this is an $and operation
             has_and = "$and" in expr
@@ -63,13 +63,17 @@ class QueryOptimizer:
             # If they fail, they should failover to a remaining conditions list
             # There's probably a better way to do this, but this is a start
             if has_and:
-                self._process_logical_conditions(
-                    "$and", expr["$and"], match_conditions, remaining_conditions
+                and_match_conditions, and_remaining_conditions = self._process_logical_conditions(
+                    "$and", expr["$and"]
                 )
+                match_conditions.extend(and_match_conditions)
+                remaining_conditions.extend(and_remaining_conditions)
             if has_or:
-                self._process_logical_conditions(
-                    "$or", expr["$or"], match_conditions, remaining_conditions
+                or_match_conditions, or_remaining_conditions = self._process_logical_conditions(
+                    "$or", expr["$or"]
                 )
+                match_conditions.extend(or_match_conditions)
+                remaining_conditions.extend(or_remaining_conditions)
             if not has_and and not has_or:
                 # Process single condition
                 optimized = convert_expression(expr)
@@ -80,19 +84,20 @@ class QueryOptimizer:
         else:
             # Can't optimize
             remaining_conditions.append(expr)
+        return match_conditions, remaining_conditions
 
     def _process_logical_conditions(
-        self, logical_op, logical_conditions, match_conditions, remaining_conditions
+        self, logical_op, logical_conditions
     ):
         """
         Process conditions within a logical array.
 
         Args:
             logical_conditions: List of conditions within logical operator
-            match_conditions: List to append optimized match conditions
-            remaining_conditions: List to append non-optimizable conditions
         """
         optimized_conditions = []
+        match_conditions = []
+        remaining_conditions = []
         for condition in logical_conditions:
             if isinstance(condition, dict):
                 if optimized := convert_expression(condition):
@@ -101,4 +106,8 @@ class QueryOptimizer:
                     remaining_conditions.append(condition)
             else:
                 remaining_conditions.append(condition)
-        match_conditions.append({"$match": {logical_op: optimized_conditions}})
+        if optimized_conditions:
+            match_conditions.append({"$match": {logical_op: optimized_conditions}})
+        else:
+            remaining_conditions = [{logical_op: logical_conditions}]
+        return match_conditions, remaining_conditions

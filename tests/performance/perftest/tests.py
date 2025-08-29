@@ -376,3 +376,22 @@ class TestLargeNestedDocFilterArray(LargeNestedDocTest, TestCase):
     def tearDown(self):
         super().tearDown()
         LargeNestedModel.objects.all().delete()
+
+class TestSmallFlatDocFilterByIn(SmallFlatDocTest, TestCase):
+    def setUp(self):
+        super().setUp()
+        self.ids = []
+        models = []
+        for doc in self.documents:
+            models.append(SmallFlatModel(**doc))
+        inserted = SmallFlatModel.objects.bulk_create(models)
+        self.ids = [model.id for model in inserted]
+
+    def do_task(self):
+        print(SmallFlatModel.objects.filter(field1__in=["miNVpaKW"]).explain())
+        for _id in self.ids:
+            list(SmallFlatModel.objects.filter(field1__in=["miNVpaKW"]))
+
+    def tearDown(self):
+        super().tearDown()
+        SmallFlatModel.objects.all().delete()

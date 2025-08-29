@@ -19,6 +19,12 @@ class SmallFlatModel(models.Model):
     field12 = models.IntegerField()
     field13 = models.IntegerField()
 
+    class Meta:
+        indexes = [
+            models.Index(fields=["field1"], name="field1_idx"),
+        ]
+
+
 
 class ForeignKeyModel(models.Model):
     name = models.CharField(max_length=100)

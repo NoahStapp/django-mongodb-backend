@@ -384,13 +384,15 @@ class TestSmallFlatDocFilterByIn(SmallFlatDocTest, TestCase):
         models = []
         for doc in self.documents:
             models.append(SmallFlatModel(**doc))
+        for model in models:
+            model.field1 = str(ObjectId())
         inserted = SmallFlatModel.objects.bulk_create(models)
-        self.ids = [model.id for model in inserted]
+        self.ids = [model.field1 for model in inserted]
 
     def do_task(self):
-        print(SmallFlatModel.objects.filter(field1__in=["miNVpaKW"]).explain())
+        print(SmallFlatModel.objects.filter(field1__in=[self.ids[0]]).explain())
         for _id in self.ids:
-            list(SmallFlatModel.objects.filter(field1__in=["miNVpaKW"]))
+            list(SmallFlatModel.objects.filter(field1__in=[_id]))
 
     def tearDown(self):
         super().tearDown()

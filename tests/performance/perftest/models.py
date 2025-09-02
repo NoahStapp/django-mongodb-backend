@@ -299,6 +299,11 @@ class LargeFlatModel(models.Model):
     field249 = models.IntegerField()
     field250 = models.IntegerField()
 
+    class Meta:
+        indexes = [
+            models.Index(fields=["field1"], name="field1_largeflat_model_idx"),
+        ]
+
 
 class StringEmbeddedModel(EmbeddedModel):
     unique_id = ObjectIdField()

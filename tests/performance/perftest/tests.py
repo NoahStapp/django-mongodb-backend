@@ -23,6 +23,7 @@ To run individual benchmarks quickly::
 
 import json
 import os
+import random
 import time
 import warnings
 from pathlib import Path
@@ -397,3 +398,48 @@ class TestSmallFlatDocFilterByIn(SmallFlatDocTest, TestCase):
     def tearDown(self):
         super().tearDown()
         SmallFlatModel.objects.all().delete()
+
+class TestSmallFlatDocFilterPkByIn(SmallFlatDocTest, TestCase):
+    def setUp(self):
+        super().setUp()
+        self.ids = []
+        models = []
+        fields = [str(ObjectId()) for _ in range(NUM_DOCS // 10)]
+        for doc in self.documents:
+            models.append(SmallFlatModel(**doc))
+
+        for model in models:
+            model.field1 = fields[random.randint(0, len(fields) - 1)]
+
+        SmallFlatModel.objects.bulk_create(models)
+        self.ids = random.sample(fields, len(fields) // 10)
+        # print(SmallFlatModel.objects.filter(id__in=[self.ids[0]]).explain())
+
+    def do_task(self):
+        list(SmallFlatModel.objects.filter(field1__in=self.ids))
+
+    def tearDown(self):
+        super().tearDown()
+        SmallFlatModel.objects.all().delete()
+
+class TestLargeFlatDocFilterPkByIn(LargeFlatDocTest, TestCase):
+    def setUp(self):
+        super().setUp()
+        self.ids = []
+        models = []
+        self.fields = [str(ObjectId()) for _ in range(NUM_DOCS // 10)]
+        for doc in self.documents:
+            models.append(LargeFlatModel(**doc))
+
+        for model in models:
+            model.field1 = self.fields[random.randint(0, len(self.fields) - 1)]
+
+        LargeFlatModel.objects.bulk_create(models)
+        print(LargeFlatModel.objects.filter(field1__in=random.sample(self.fields, 1)).explain())
+
+    def do_task(self):
+        list(LargeFlatModel.objects.filter(field1__in=random.sample(self.fields, len(self.fields) // 10)))
+
+    def tearDown(self):
+        super().tearDown()
+        LargeFlatModel.objects.all().delete()

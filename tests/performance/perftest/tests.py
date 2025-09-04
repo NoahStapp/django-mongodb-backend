@@ -23,7 +23,9 @@ To run individual benchmarks quickly::
 
 import json
 import os
+import random
 import time
+import unittest
 import warnings
 from pathlib import Path
 
@@ -50,10 +52,13 @@ if os.environ.get("FASTBENCH"):
     MAX_ITERATION_TIME = 10
     NUM_DOCS = 1000
 else:
-    NUM_ITERATIONS = 10
-    MIN_ITERATION_TIME = 30
-    MAX_ITERATION_TIME = 120
-    NUM_DOCS = 10000
+    NUM_DOCS = 1_000_000
+    NUM_ITERATIONS = 1
+    MIN_ITERATION_TIME = 1
+    # NUM_ITERATIONS = 10
+    # MIN_ITERATION_TIME = 30
+    MAX_ITERATION_TIME = 1
+    # NUM_DOCS = 10000
 
 TEST_PATH = os.environ.get("TEST_PATH", Path(os.path.realpath(__file__)).parent.parent / "odm-data")
 
@@ -397,3 +402,49 @@ class TestSmallFlatDocFilterByIn(SmallFlatDocTest, TestCase):
     def tearDown(self):
         super().tearDown()
         SmallFlatModel.objects.all().delete()
+
+class TestSmallFlatDocFilterPkByIn(SmallFlatDocTest, TestCase):
+    def setUp(self):
+        super().setUp()
+        self.ids = []
+        models = []
+        fields = [str(ObjectId()) for _ in range(NUM_DOCS // 10)]
+        for doc in self.documents:
+            models.append(SmallFlatModel(**doc))
+
+        for model in models:
+            model.field1 = fields[random.randint(0, len(fields) - 1)]
+
+        SmallFlatModel.objects.bulk_create(models)
+        self.ids = random.sample(fields, len(fields) // 10)
+        # print(SmallFlatModel.objects.filter(id__in=[self.ids[0]]).explain())
+
+    def do_task(self):
+        list(SmallFlatModel.objects.filter(field1__in=self.ids))
+
+    def tearDown(self):
+        super().tearDown()
+        SmallFlatModel.objects.all().delete()
+
+class TestLargeFlatDocFilterPkByIn(LargeFlatDocTest, unittest.TestCase):
+    def setUp(self):
+        super().setUp()
+        # LargeFlatModel.objects.all().delete()
+        # self.ids = []
+        # models = []
+        # # self.fields = [str(ObjectId()) for _ in range(NUM_DOCS // 10)]
+        # for doc in self.documents:
+        #     models.append(LargeFlatModel(**doc))
+        # # for model in models:
+        # #     model.field1 = self.fields[random.randint(0, len(self.fields) - 1)]
+        #
+        # LargeFlatModel.objects.bulk_create(models)
+        self.id = LargeFlatModel.objects.first().id
+        print(LargeFlatModel.objects.filter(id__in=[self.id]).explain())
+
+    def do_task(self):
+        list(LargeFlatModel.objects.filter(id__in=[self.id]))
+
+    def tearDown(self):
+        super().tearDown()
+        # LargeFlatModel.objects.all().delete()

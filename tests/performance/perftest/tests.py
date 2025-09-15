@@ -308,16 +308,15 @@ class LargeNestedDocTest(PerformanceTest):
                     array_models = []
                     for item in v:
                         embedded_str_model = StringEmbeddedModel(**item)
-                        embedded_str_model.unique_id = ObjectId()
+                        embedded_str_model.unique_field = str(ObjectId())
                         array_models.append(embedded_str_model)
                     setattr(model, k, array_models)
                 elif "str" in k:
                     embedded_str_model = StringEmbeddedModel(**v)
-                    embedded_str_model.unique_id = ObjectId()
+                    embedded_str_model.unique_field = str(ObjectId())
                     setattr(model, k, embedded_str_model)
                 else:
                     embedded_int_model = IntegerEmbeddedModel(**v)
-                    embedded_int_model.unique_id = ObjectId()
                     setattr(model, k, embedded_int_model)
             model.save()
 
@@ -353,12 +352,12 @@ class TestLargeNestedDocFilterById(LargeNestedDocTest, TestCase):
         super().setUp()
         self.create_model()
         self.ids = [
-            model.embedded_str_doc_1.unique_id for model in list(LargeNestedModel.objects.all())
+            model.embedded_str_doc_1.unique_field for model in list(LargeNestedModel.objects.all())
         ]
 
     def do_task(self):
         for _id in self.ids:
-            list(LargeNestedModel.objects.filter(embedded_str_doc_1__unique_id=_id))
+            list(LargeNestedModel.objects.filter(embedded_str_doc_1__id=_id))
 
     def tearDown(self):
         super().tearDown()
@@ -370,13 +369,13 @@ class TestLargeNestedDocFilterArray(LargeNestedDocTest, TestCase):
         super().setUp()
         self.create_model()
         self.ids = [
-            model.embedded_str_doc_array[0].unique_id
+            model.embedded_str_doc_array[0].id
             for model in list(LargeNestedModel.objects.all())
         ]
 
     def do_task(self):
         for _id in self.ids:
-            list(LargeNestedModel.objects.filter(embedded_str_doc_array__unique_id__in=[_id]))
+            list(LargeNestedModel.objects.filter(embedded_str_doc_array__id__in=[_id]))
 
     def tearDown(self):
         super().tearDown()
@@ -429,16 +428,10 @@ class TestSmallFlatDocFilterPkByIn(SmallFlatDocTest, TestCase):
 class TestLargeFlatDocFilterPkByIn(LargeFlatDocTest, unittest.TestCase):
     def setUp(self):
         super().setUp()
-        # LargeFlatModel.objects.all().delete()
-        # self.ids = []
-        # models = []
-        # # self.fields = [str(ObjectId()) for _ in range(NUM_DOCS // 10)]
-        # for doc in self.documents:
-        #     models.append(LargeFlatModel(**doc))
-        # # for model in models:
-        # #     model.field1 = self.fields[random.randint(0, len(self.fields) - 1)]
-        #
-        # LargeFlatModel.objects.bulk_create(models)
+        models = []
+        for doc in self.documents:
+            models.append(LargeFlatModel(**doc))
+        LargeFlatModel.objects.bulk_create(models)
         self.id = LargeFlatModel.objects.first().id
         print(LargeFlatModel.objects.filter(id__in=[self.id]).explain())
 
@@ -447,4 +440,4 @@ class TestLargeFlatDocFilterPkByIn(LargeFlatDocTest, unittest.TestCase):
 
     def tearDown(self):
         super().tearDown()
-        # LargeFlatModel.objects.all().delete()
+        LargeFlatModel.objects.all().delete()

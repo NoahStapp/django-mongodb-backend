@@ -301,7 +301,7 @@ class LargeFlatModel(models.Model):
 
 
 class StringEmbeddedModel(EmbeddedModel):
-    unique_id = ObjectIdField()
+    unique_field = models.CharField(max_length=100)
     field1 = models.CharField(max_length=100)
     field2 = models.CharField(max_length=100)
     field3 = models.CharField(max_length=100)
@@ -320,7 +320,6 @@ class StringEmbeddedModel(EmbeddedModel):
 
 
 class IntegerEmbeddedModel(EmbeddedModel):
-    unique_id = ObjectIdField()
     field1 = models.IntegerField()
     field2 = models.IntegerField()
     field3 = models.IntegerField()

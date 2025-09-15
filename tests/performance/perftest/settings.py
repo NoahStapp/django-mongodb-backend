@@ -68,7 +68,7 @@ PASSWORD = os.environ.get("ATLAS_DEV_PASSWORD")
 # }
 
 settings = django_mongodb_backend.parse_uri(
-    f"mongodb+srv://{USER}:{PASSWORD}@intpython736.oztdp.mongodb-dev.net/benchmarking?retryWrites=true&w=majority&appName=INTPYTHON736"
+    f"mongodb://localhost:27017/benchmarking",
 )
 DATABASES = {
     "default": settings,

@@ -19,7 +19,7 @@ keywords = [
     "django"
 ]
 classifiers = [
-    "Development Status :: 4 - Beta",
+    "Development Status :: 5 - Production/Stable",
     "Framework :: Django",
     "Framework :: Django :: 5.2",
     "Intended Audience :: Developers",
@@ -34,7 +34,11 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
-docs = [ "sphinx>=7"]
+docs = [
+    "sphinx>=7",
+    "furo>=2025.7.19",
+    "sphinx-copybutton",
+]
 
 [project.urls]
 Homepage = "https://www.mongodb.org"
@@ -93,6 +97,7 @@ ignore = [
   "S101",   # Use of `assert` detected
   "RUF012", # Mutable class attributes should be annotated with `typing.ClassVar`
   "PLW2901", # `for` loop variable `value` overwritten by assignment target
+  "UP038",  # non-pep604-isinstance is deprecated
 ]
 unfixable = []
 exclude = []

@@ -2,6 +2,69 @@
 Django MongoDB Backend 5.2.x
 ============================
 
+5.2.2
+=====
+
+*Unreleased*
+
+New features
+------------
+
+- ...
+
+Bug fixes
+---------
+
+- ...
+
+5.2.1
+=====
+
+*September 8, 2025*
+
+New features
+------------
+
+- Allowed :ref:`specifying the MongoDB connection string
+  <configuring-databases-setting>` in ``DATABASES["HOST"]``, eliminating the
+  need to use :func:`~django_mongodb_backend.utils.parse_uri` to configure the
+  :setting:`DATABASES` setting.
+
+Bug fixes
+---------
+
+- Migrations operations that add or delete search indexes now wait until the
+  operation is completed on the server to prevent conflicts when running
+  multiple operations sequentially.
+
+Performance improvements
+------------------------
+
+- Made simple queries that use ``$eq``, ``$in``, ``$and``, ``$or``, ``$gt``,
+  ``$gte``, ``$lt``, and/or ``$lte`` use ``$match`` instead of ``$expr`` so
+  that they can use indexes.
+
+5.2.0
+=====
+
+*September 2, 2025*
+
+General availability release. No changes since beta 3.
+
+5.2.0 beta 3
+============
+
+*August 29, 2025*
+
+Backwards incompatible changes
+------------------------------
+
+- Pattern matching lookups (``iexact``, ``startswith``, ``istartswith``,
+  ``endswith``, ``iendswith``, ``contains``, ``icontains``, ``regex``,
+  and ``iregex``) no longer support non-string fields. These lookups previously
+  cast their input using ``$toString`` but this caused some queries to perform
+  poorly because MongoDB couldn't use indexes when running the query.
+
 5.2.0 beta 2
 ============
 

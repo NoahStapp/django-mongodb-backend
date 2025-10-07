@@ -180,6 +180,6 @@ buildvariants:
     display_name: Performance Benchmarks
     run_on:
       - rhel90-dbx-perf-large
-    batchtime: 10080
+    batchtime: 1440
     tasks:
       - name: perf-tests

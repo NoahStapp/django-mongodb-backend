@@ -205,6 +205,7 @@ class TestSmallFlatDocUpdate(SmallFlatDocTest, TestCase):
         self.iteration += 1
 
     def tearDown(self):
+        super().tearDown()
         SmallFlatModel.objects.all().delete()
 
 
@@ -286,6 +287,7 @@ class TestLargeFlatDocUpdate(LargeFlatDocTest, TestCase):
         self.iteration += 1
 
     def tearDown(self):
+        super().tearDown()
         LargeFlatModel.objects.all().delete()
 
 
@@ -344,6 +346,7 @@ class TestLargeNestedDocUpdate(LargeNestedDocTest, TestCase):
         self.iteration += 1
 
     def tearDown(self):
+        super().tearDown()
         LargeNestedModel.objects.all().delete()
 
 

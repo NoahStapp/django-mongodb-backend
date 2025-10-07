@@ -53,6 +53,7 @@ if os.environ.get("FASTBENCH"):
 else:
     NUM_ITERATIONS = 10
     MIN_ITERATION_TIME = 30
+    MAX_ITERATION_TIME = 60
     NUM_DOCS = 10000
 
 TEST_PATH = os.environ.get("TEST_PATH", Path(os.path.realpath(__file__)).parent.parent / "odm-data")

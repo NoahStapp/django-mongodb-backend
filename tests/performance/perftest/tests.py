@@ -23,7 +23,6 @@ To run individual benchmarks quickly::
 
 import json
 import os
-import random
 import time
 import unittest
 import warnings
@@ -52,13 +51,9 @@ if os.environ.get("FASTBENCH"):
     MAX_ITERATION_TIME = 10
     NUM_DOCS = 1000
 else:
-    NUM_DOCS = 1_000_000
-    NUM_ITERATIONS = 1
-    MIN_ITERATION_TIME = 1
-    # NUM_ITERATIONS = 10
-    # MIN_ITERATION_TIME = 30
-    MAX_ITERATION_TIME = 1
-    # NUM_DOCS = 10000
+    NUM_ITERATIONS = 10
+    MIN_ITERATION_TIME = 30
+    NUM_DOCS = 10000
 
 TEST_PATH = os.environ.get("TEST_PATH", Path(os.path.realpath(__file__)).parent.parent / "odm-data")
 
@@ -372,8 +367,7 @@ class TestLargeNestedDocFilterArray(LargeNestedDocTest, TestCase):
         super().setUp()
         self.create_model()
         self.ids = [
-            model.embedded_str_doc_array[0].id
-            for model in list(LargeNestedModel.objects.all())
+            model.embedded_str_doc_array[0].id for model in list(LargeNestedModel.objects.all())
         ]
 
     def do_task(self):
@@ -383,6 +377,7 @@ class TestLargeNestedDocFilterArray(LargeNestedDocTest, TestCase):
     def tearDown(self):
         super().tearDown()
         LargeNestedModel.objects.all().delete()
+
 
 class TestSmallFlatDocFilterByIn(SmallFlatDocTest, TestCase):
     def setUp(self):
@@ -397,7 +392,6 @@ class TestSmallFlatDocFilterByIn(SmallFlatDocTest, TestCase):
         self.ids = [model.field1 for model in inserted]
 
     def do_task(self):
-        print(SmallFlatModel.objects.filter(field1__in=[self.ids[0]]).explain())
         for _id in self.ids:
             list(SmallFlatModel.objects.filter(field1__in=[_id]))
 
@@ -405,28 +399,25 @@ class TestSmallFlatDocFilterByIn(SmallFlatDocTest, TestCase):
         super().tearDown()
         SmallFlatModel.objects.all().delete()
 
+
 class TestSmallFlatDocFilterPkByIn(SmallFlatDocTest, TestCase):
     def setUp(self):
         super().setUp()
         self.ids = []
         models = []
-        fields = [str(ObjectId()) for _ in range(NUM_DOCS // 10)]
         for doc in self.documents:
             models.append(SmallFlatModel(**doc))
 
-        for model in models:
-            model.field1 = fields[random.randint(0, len(fields) - 1)]
-
         SmallFlatModel.objects.bulk_create(models)
-        self.ids = random.sample(fields, len(fields) // 10)
-        # print(SmallFlatModel.objects.filter(id__in=[self.ids[0]]).explain())
+        self.ids = [model.id for model in models]
 
     def do_task(self):
-        list(SmallFlatModel.objects.filter(field1__in=self.ids))
+        list(SmallFlatModel.objects.filter(id__in=self.ids))
 
     def tearDown(self):
         super().tearDown()
         SmallFlatModel.objects.all().delete()
+
 
 class TestLargeFlatDocFilterPkByIn(LargeFlatDocTest, unittest.TestCase):
     def setUp(self):
@@ -436,7 +427,6 @@ class TestLargeFlatDocFilterPkByIn(LargeFlatDocTest, unittest.TestCase):
             models.append(LargeFlatModel(**doc))
         LargeFlatModel.objects.bulk_create(models)
         self.id = LargeFlatModel.objects.first().id
-        print(LargeFlatModel.objects.filter(id__in=[self.id]).explain())
 
     def do_task(self):
         list(LargeFlatModel.objects.filter(id__in=[self.id]))

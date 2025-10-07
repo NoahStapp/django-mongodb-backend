@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
+
 import os
 from pathlib import Path
 
@@ -68,7 +69,7 @@ PASSWORD = os.environ.get("ATLAS_DEV_PASSWORD")
 # }
 
 settings = django_mongodb_backend.parse_uri(
-    f"mongodb://localhost:27017/benchmarking",
+    "mongodb://localhost:27017/benchmarking",
 )
 DATABASES = {
     "default": settings,

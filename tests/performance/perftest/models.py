@@ -1,6 +1,6 @@
 from django.db import models
 
-from django_mongodb_backend.fields import EmbeddedModelArrayField, EmbeddedModelField, ObjectIdField
+from django_mongodb_backend.fields import EmbeddedModelArrayField, EmbeddedModelField
 from django_mongodb_backend.models import EmbeddedModel
 
 
@@ -23,7 +23,6 @@ class SmallFlatModel(models.Model):
         indexes = [
             models.Index(fields=["field1"], name="field1_idx"),
         ]
-
 
 
 class ForeignKeyModel(models.Model):

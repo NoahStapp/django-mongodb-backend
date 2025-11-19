@@ -5,6 +5,9 @@ from django.utils.functional import cached_property
 class GISFeatures(BaseSpatialFeatures):
     has_spatialrefsys_table = False
     supports_transform = False
+    supports_distance_geodetic = False
+    has_Distance_function = False
+    has_Union_function = False
 
     @cached_property
     def django_test_expected_failures(self):
@@ -39,6 +42,11 @@ class GISFeatures(BaseSpatialFeatures):
                     # SouthTexasCity fixture objects use SRID 2278 which is ignored
                     # by the patched version of loaddata in the Django fork.
                     "gis_tests.distapp.tests.DistanceTest.test_init",
+                    "gis_tests.distapp.tests.DistanceTest.test_distance_lookups",
+                    "gis_tests.distapp.tests.DistanceTest.test_distance_lookups_with_expression_rhs",
+                    "gis_tests.distapp.tests.DistanceTest.test_distance_annotation_group_by",
+                    "gis_tests.distapp.tests.DistanceFunctionsTests.test_distance_simple",
+                    "gis_tests.distapp.tests.DistanceFunctionsTests.test_distance_order_by",
                 },
                 "ImproperlyConfigured isn't raised when using RasterField": {
                     # Normally RasterField.db_type() raises an error, but MongoDB
@@ -49,9 +57,12 @@ class GISFeatures(BaseSpatialFeatures):
                     # Error: Index already exists with a different name
                     "gis_tests.geoapp.test_indexes.SchemaIndexesTests.test_index_name",
                 },
-                "GIS lookups not supported.": {
-                    "gis_tests.geoapp.tests.GeoModelTest.test_gis_query_as_string",
+                "GIS Union not supported.": {
                     "gis_tests.geoapp.tests.GeoLookupTest.test_gis_lookups_with_complex_expressions",
+                },
+                "Subqueries not supported.": {
+                    "gis_tests.geoapp.tests.GeoLookupTest.test_subquery_annotation",
+                    "gis_tests.geoapp.tests.GeoQuerySetTest.test_within_subquery",
                 },
                 "GeoJSONSerializer doesn't support ObjectId.": {
                     "gis_tests.geoapp.test_serializers.GeoJSONSerializerTests.test_fields_option",

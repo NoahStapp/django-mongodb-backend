@@ -1,11 +1,110 @@
+import warnings
+
 from django.contrib.gis import geos
 from django.contrib.gis.db import models
 from django.contrib.gis.db.backends.base.operations import BaseSpatialOperations
+from django.contrib.gis.measure import Distance
+from django.db.backends.base.operations import BaseDatabaseOperations
 
 from .adapter import Adapter
+from .utils import SpatialOperator
 
 
-class GISOperations(BaseSpatialOperations):
+def _gis_within_operator(field, value, op=None, params=None):
+    print(f"Within value: {value}")
+    return {
+        field: {
+            "$geoWithin": {
+                "$geometry": {
+                    "type": value["type"],
+                    "coordinates": value["coordinates"],
+                }
+            }
+        }
+    }
+
+
+def _gis_intersects_operator(field, value, op=None, params=None):
+    return {
+        field: {
+            "$geoIntersects": {
+                "$geometry": {
+                    "type": value["type"],
+                    "coordinates": value["coordinates"],
+                }
+            }
+        }
+    }
+
+
+def _gis_disjoint_operator(field, value, op=None, params=None):
+    return {
+        field: {
+            "$not": {
+                "$geoIntersects": {
+                    "$geometry": {
+                        "type": value["type"],
+                        "coordinates": value["coordinates"],
+                    }
+                }
+            }
+        }
+    }
+
+
+def _gis_contains_operator(field, value, op=None, params=None):
+    value_type = value["type"]
+    if value_type != "Point":
+        warnings.warn(
+            "MongoDB does not support strict contains on non-Point query geometries. Results will be for intersection."
+        )
+    return {
+        field: {
+            "$geoIntersects": {
+                "$geometry": {
+                    "type": value_type,
+                    "coordinates": value["coordinates"],
+                }
+            }
+        }
+    }
+
+
+def _gis_distance_operator(field, value, op=None, params=None):
+    print(f"Distance: {params}")
+    if hasattr(params[0], "m"):
+        distance = params[0].m
+    else:
+        distance = params[0]
+    if op == "distance_gt" or op == "distance_gte":
+        cmd = {
+            field: {
+                "$not": {
+                    "$geoWithin": {
+                        "$centerSphere": [
+                            value["coordinates"],
+                            distance / 6378100,  # radius of earth in meters
+                        ],
+                    }
+                }
+            }
+        }
+    else:
+        cmd = {
+            field: {
+                "$geoWithin": {
+                    "$centerSphere": [
+                        value["coordinates"],
+                        distance / 6378100,  # radius of earth in meters
+                    ],
+                }
+            }
+        }
+    print(f"Command: {cmd}")
+    return cmd
+
+
+class GISOperations(BaseSpatialOperations, BaseDatabaseOperations):
     Adapter = Adapter
 
     disallowed_aggregates = (
@@ -18,7 +117,16 @@ class GISOperations(BaseSpatialOperations):
 
     @property
     def gis_operators(self):
-        return {}
+        return {
+            "contains": SpatialOperator("contains", _gis_contains_operator),
+            "intersects": SpatialOperator("intersects", _gis_intersects_operator),
+            "disjoint": SpatialOperator("disjoint", _gis_disjoint_operator),
+            "within": SpatialOperator("within", _gis_within_operator),
+            "distance_gt": SpatialOperator("distance_gt", _gis_distance_operator),
+            "distance_gte": SpatialOperator("distance_gte", _gis_distance_operator),
+            "distance_lt": SpatialOperator("distance_lt", _gis_distance_operator),
+            "distance_lte": SpatialOperator("distance_lte", _gis_distance_operator),
+        }
 
     unsupported_functions = {
         "Area",
@@ -33,7 +141,6 @@ class GISOperations(BaseSpatialOperations):
         "Centroid",
         "ClosestPoint",
         "Difference",
-        "Distance",
         "Envelope",
         "ForcePolygonCW",
         "FromWKB",
@@ -95,3 +202,15 @@ class GISOperations(BaseSpatialOperations):
             return geom_class(*value["coordinates"], srid=srid)
 
         return converter
+
+    def get_distance(self, f, value, lookup_type):
+        value = value[0]
+        if isinstance(value, Distance):
+            if f.geodetic(self.connection):
+                raise ValueError(
+                    "Only numeric values of degree units are allowed on geodetic distance queries."
+                )
+            dist_param = getattr(value, Distance.unit_attname(f.units_name(self.connection)))
+        else:
+            dist_param = value
+        return [dist_param]

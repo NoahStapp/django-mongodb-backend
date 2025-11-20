@@ -55,10 +55,15 @@ class GISFeatures(BaseSpatialFeatures):
                 },
                 "GIS Union not supported.": {
                     "gis_tests.geoapp.tests.GeoLookupTest.test_gis_lookups_with_complex_expressions",
+                    "gis_tests.distapp.tests.DistanceTest.test_dwithin",
+                },
+                "Cannot use a non-Point geometry with distance lookups.": {
+                    "gis_tests.distapp.tests.DistanceTest.test_dwithin_with_expression_rhs"
                 },
                 "Subqueries not supported.": {
                     "gis_tests.geoapp.tests.GeoLookupTest.test_subquery_annotation",
                     "gis_tests.geoapp.tests.GeoQuerySetTest.test_within_subquery",
+                    "gis_tests.distapp.tests.DistanceTest.test_dwithin_subquery",
                 },
                 "GeoJSONSerializer doesn't support ObjectId.": {
                     "gis_tests.geoapp.test_serializers.GeoJSONSerializerTests.test_fields_option",

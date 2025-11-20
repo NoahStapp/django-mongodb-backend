@@ -95,6 +95,10 @@ def _gis_distance_operator(field, value, op=None, params=None):
     return cmd
 
 
+def _gis_dwithin_operator(field, value, op=None, params=None):  # noqa: ARG001
+    return {field: {"$geoWithin": {"$centerSphere": [value["coordinates"], params[0]]}}}
+
+
 class GISOperations(BaseSpatialOperations, BaseDatabaseOperations):
     Adapter = Adapter
 
@@ -117,6 +121,7 @@ class GISOperations(BaseSpatialOperations, BaseDatabaseOperations):
             "distance_gte": SpatialOperator("distance_gte", _gis_distance_operator),
             "distance_lt": SpatialOperator("distance_lt", _gis_distance_operator),
             "distance_lte": SpatialOperator("distance_lte", _gis_distance_operator),
+            "dwithin": SpatialOperator("dwithin", _gis_dwithin_operator),
         }
 
     unsupported_functions = {

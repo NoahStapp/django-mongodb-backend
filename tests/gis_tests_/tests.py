@@ -51,3 +51,8 @@ class LookupTests(TestCase):
         city = City.objects.create(point=Point(40.7589, -73.9851))
         qs = City.objects.filter(point__distance_lt=(Point(40.7670, -73.9820), 1000))
         self.assertIn(city, qs)
+
+    def test_dwithin_lookup(self):
+        city = City.objects.create(point=Point(40.7589, -73.9851))
+        qs = City.objects.filter(point__dwithin=(Point(40.7670, -73.9820), 1000))
+        self.assertIn(city, qs)

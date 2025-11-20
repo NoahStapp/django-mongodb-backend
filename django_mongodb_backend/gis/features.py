@@ -43,8 +43,6 @@ class GISFeatures(BaseSpatialFeatures):
                     "gis_tests.distapp.tests.DistanceTest.test_distance_lookups",
                     "gis_tests.distapp.tests.DistanceTest.test_distance_lookups_with_expression_rhs",
                     "gis_tests.distapp.tests.DistanceTest.test_distance_annotation_group_by",
-                    # "gis_tests.distapp.tests.DistanceFunctionsTests.test_distance_simple",
-                    # "gis_tests.distapp.tests.DistanceFunctionsTests.test_distance_order_by",
                 },
                 "ImproperlyConfigured isn't raised when using RasterField": {
                     # Normally RasterField.db_type() raises an error, but MongoDB

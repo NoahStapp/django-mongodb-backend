@@ -9,8 +9,8 @@ def _gis_lookup(self, compiler, connection, as_expr=False):
     rhs_mql = process_rhs(self, compiler, connection, as_expr=as_expr)
     try:
         rhs_op = self.get_rhs_op(connection, rhs_mql)
-    except KeyError:
-        raise NotSupportedError(f"MongoDB does not support the '{self.lookup_name}' lookup.")
+    except KeyError as e:
+        raise NotSupportedError(f"MongoDB does not support the '{self.lookup_name}' lookup.") from e
     return rhs_op.as_mql(lhs_mql, rhs_mql, self.rhs_params)
 
 

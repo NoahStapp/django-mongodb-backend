@@ -9,8 +9,7 @@ from .adapter import Adapter
 from .utils import SpatialOperator
 
 
-def _gis_within_operator(field, value, op=None, params=None):
-    # print(f"Within value: {value}")
+def _gis_within_operator(field, value, op=None, params=None):  # noqa: ARG001
     return {
         field: {
             "$geoWithin": {
@@ -23,7 +22,7 @@ def _gis_within_operator(field, value, op=None, params=None):
     }
 
 
-def _gis_intersects_operator(field, value, op=None, params=None):
+def _gis_intersects_operator(field, value, op=None, params=None):  # noqa: ARG001
     return {
         field: {
             "$geoIntersects": {
@@ -36,7 +35,7 @@ def _gis_intersects_operator(field, value, op=None, params=None):
     }
 
 
-def _gis_disjoint_operator(field, value, op=None, params=None):
+def _gis_disjoint_operator(field, value, op=None, params=None):  # noqa: ARG001
     return {
         field: {
             "$not": {
@@ -51,7 +50,7 @@ def _gis_disjoint_operator(field, value, op=None, params=None):
     }
 
 
-def _gis_contains_operator(field, value, op=None, params=None):
+def _gis_contains_operator(field, value, op=None, params=None):  # noqa: ARG001
     value_type = value["type"]
     if value_type != "Point":
         raise NotSupportedError("MongoDB does not support contains on non-Point query geometries.")
@@ -68,11 +67,7 @@ def _gis_contains_operator(field, value, op=None, params=None):
 
 
 def _gis_distance_operator(field, value, op=None, params=None):
-    # print(f"Distance: {params}")
-    if hasattr(params[0], "m"):
-        distance = params[0].m
-    else:
-        distance = params[0]
+    distance = params[0].m if hasattr(params[0], "m") else params[0]
     if op == "distance_gt" or op == "distance_gte":
         cmd = {
             field: {
@@ -97,7 +92,6 @@ def _gis_distance_operator(field, value, op=None, params=None):
                 }
             }
         }
-    # print(f"Command: {cmd}")
     return cmd
 
 

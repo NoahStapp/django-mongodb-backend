@@ -1,9 +1,8 @@
-import warnings
-
 from django.contrib.gis import geos
 from django.contrib.gis.db import models
 from django.contrib.gis.db.backends.base.operations import BaseSpatialOperations
 from django.contrib.gis.measure import Distance
+from django.db import NotSupportedError
 from django.db.backends.base.operations import BaseDatabaseOperations
 
 from .adapter import Adapter
@@ -11,7 +10,7 @@ from .utils import SpatialOperator
 
 
 def _gis_within_operator(field, value, op=None, params=None):
-    print(f"Within value: {value}")
+    # print(f"Within value: {value}")
     return {
         field: {
             "$geoWithin": {
@@ -55,9 +54,7 @@ def _gis_disjoint_operator(field, value, op=None, params=None):
 def _gis_contains_operator(field, value, op=None, params=None):
     value_type = value["type"]
     if value_type != "Point":
-        warnings.warn(
-            "MongoDB does not support strict contains on non-Point query geometries. Results will be for intersection."
-        )
+        raise NotSupportedError("MongoDB does not support contains on non-Point query geometries.")
     return {
         field: {
             "$geoIntersects": {
@@ -71,7 +68,7 @@ def _gis_contains_operator(field, value, op=None, params=None):
 
 
 def _gis_distance_operator(field, value, op=None, params=None):
-    print(f"Distance: {params}")
+    # print(f"Distance: {params}")
     if hasattr(params[0], "m"):
         distance = params[0].m
     else:
@@ -100,7 +97,7 @@ def _gis_distance_operator(field, value, op=None, params=None):
                 }
             }
         }
-    print(f"Command: {cmd}")
+    # print(f"Command: {cmd}")
     return cmd
 
 
@@ -140,6 +137,7 @@ class GISOperations(BaseSpatialOperations, BaseDatabaseOperations):
         "BoundingCircle",
         "Centroid",
         "ClosestPoint",
+        "Distance",
         "Difference",
         "Envelope",
         "ForcePolygonCW",

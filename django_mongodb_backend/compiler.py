@@ -359,7 +359,7 @@ class SQLCompiler(compiler.SQLCompiler):
         except EmptyResultSet:
             return iter([]) if result_type == MULTI else None
 
-        print(f"Query: {query}")
+        # print(f"Query: {query}")
         cursor = query.get_cursor()
         if result_type == SINGLE:
             try:
@@ -786,7 +786,7 @@ class SQLCompiler(compiler.SQLCompiler):
         for option in self.connection.ops.explain_options:
             if value := options.get(option):
                 kwargs[option] = value
-        print(f"PIPELINE: {pipeline}")
+        # print(f"PIPELINE: {pipeline}")
         explain = self.connection.database.command(
             "explain",
             {"aggregate": self.collection_name, "pipeline": pipeline, "cursor": {}},

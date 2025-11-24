@@ -4,8 +4,8 @@ from django.utils.functional import cached_property
 
 class GISFeatures(BaseSpatialFeatures):
     has_spatialrefsys_table = False
-    supports_transform = False
     supports_distance_geodetic = False
+    supports_transform = False
 
     @cached_property
     def django_test_expected_failures(self):

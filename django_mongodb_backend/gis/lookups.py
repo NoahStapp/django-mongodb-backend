@@ -5,6 +5,8 @@ from django_mongodb_backend.query_utils import process_lhs, process_rhs
 
 
 def gis_lookup(self, compiler, connection, as_expr=False):
+    if as_expr:
+        raise NotSupportedError("MongoDB does not support GIS lookups as expressions.")
     lhs_mql = process_lhs(self, compiler, connection, as_expr=as_expr)
     rhs_mql = process_rhs(self, compiler, connection, as_expr=as_expr)
     try:

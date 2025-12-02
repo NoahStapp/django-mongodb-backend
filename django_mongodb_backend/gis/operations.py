@@ -2,7 +2,6 @@ from django.contrib.gis import geos
 from django.contrib.gis.db import models
 from django.contrib.gis.db.backends.base.operations import BaseSpatialOperations
 from django.contrib.gis.measure import Distance
-from django.db.backends.base.operations import BaseDatabaseOperations
 
 from .adapter import Adapter
 from .operators import (
@@ -18,7 +17,7 @@ from .operators import (
 )
 
 
-class GISOperations(BaseSpatialOperations, BaseDatabaseOperations):
+class GISOperations(BaseSpatialOperations):
     Adapter = Adapter
 
     disallowed_aggregates = (

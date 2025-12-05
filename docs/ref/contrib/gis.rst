@@ -50,4 +50,5 @@ Limitations
   (:attr:`BaseSpatialField.srid
   <django.contrib.gis.db.models.BaseSpatialField.srid>`)
   besides `4326 (WGS84) <https://spatialreference.org/ref/epsg/4326/>`_.
+- QuerySet APIs do not support subqueries or expressions.
 - :class:`~django.contrib.gis.db.models.RasterField` isn't supported.

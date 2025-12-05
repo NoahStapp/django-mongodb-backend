@@ -8,31 +8,20 @@ class Operator:
         return self.name, []
 
 
-class Within(Operator):
-    name = "within"
+class Contains(Operator):
+    name = "contains"
 
     def as_mql(self, field, value, params=None):
-        return {
-            field: {
-                "$geoWithin": {
-                    "$geometry": {
-                        "type": value["type"],
-                        "coordinates": value["coordinates"],
-                    }
-                }
-            }
-        }
-
-
-class Intersects(Operator):
-    name = "intersects"
-
-    def as_mql(self, field, value, params=None):
+        value_type = value["type"]
+        if value_type != "Point":
+            raise NotSupportedError(
+                "MongoDB does not support contains on non-Point query geometries."
+            )
         return {
             field: {
                 "$geoIntersects": {
                     "$geometry": {
-                        "type": value["type"],
+                        "type": value_type,
                         "coordinates": value["coordinates"],
                     }
                 }
@@ -52,27 +41,6 @@ class Disjoint(Operator):
                             "type": value["type"],
                             "coordinates": value["coordinates"],
                         }
-                    }
-                }
-            }
-        }
-
-
-class Contains(Operator):
-    name = "contains"
-
-    def as_mql(self, field, value, params=None):
-        value_type = value["type"]
-        if value_type != "Point":
-            raise NotSupportedError(
-                "MongoDB does not support contains on non-Point query geometries."
-            )
-        return {
-            field: {
-                "$geoIntersects": {
-                    "$geometry": {
-                        "type": value_type,
-                        "coordinates": value["coordinates"],
                     }
                 }
             }
@@ -132,3 +100,35 @@ class DWithin(Operator):
 
     def as_mql(self, field, value, params=None):
         return {field: {"$geoWithin": {"$centerSphere": [value["coordinates"], params[0]]}}}
+
+
+class Intersects(Operator):
+    name = "intersects"
+
+    def as_mql(self, field, value, params=None):
+        return {
+            field: {
+                "$geoIntersects": {
+                    "$geometry": {
+                        "type": value["type"],
+                        "coordinates": value["coordinates"],
+                    }
+                }
+            }
+        }
+
+
+class Within(Operator):
+    name = "within"
+
+    def as_mql(self, field, value, params=None):
+        return {
+            field: {
+                "$geoWithin": {
+                    "$geometry": {
+                        "type": value["type"],
+                        "coordinates": value["coordinates"],
+                    }
+                }
+            }
+        }

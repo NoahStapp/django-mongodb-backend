@@ -28,21 +28,17 @@ class GISOperations(BaseSpatialOperations):
         models.Union,
     )
 
-    operators = {
+    gis_operators = {
         "contains": Contains(),
-        "intersects": Intersects(),
         "disjoint": Disjoint(),
-        "within": Within(),
         "distance_gt": DistanceGT(),
         "distance_gte": DistanceGTE(),
         "distance_lt": DistanceLT(),
         "distance_lte": DistanceLTE(),
         "dwithin": DWithin(),
+        "intersects": Intersects(),
+        "within": Within(),
     }
-
-    @property
-    def gis_operators(self):
-        return self.operators
 
     unsupported_functions = {
         "Area",

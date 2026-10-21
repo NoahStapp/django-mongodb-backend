@@ -127,7 +127,7 @@
       "version": "3.12.1"
     },
     {
-      "bom-ref": "boto3==1.43.69",
+      "bom-ref": "boto3==1.43.74",
       "description": "The AWS SDK for Python",
       "externalReferences": [
         {
@@ -154,12 +154,12 @@
         }
       ],
       "name": "boto3",
-      "purl": "pkg:pypi/boto3@1.43.69",
+      "purl": "pkg:pypi/boto3@1.43.74",
       "type": "library",
-      "version": "1.43.69"
+      "version": "1.43.74"
     },
     {
-      "bom-ref": "botocore==1.43.69",
+      "bom-ref": "botocore==1.43.74",
       "description": "Low-level, data-driven core of boto 3.",
       "externalReferences": [
         {
@@ -182,9 +182,9 @@
           "value": "crt"
         }
       ],
-      "purl": "pkg:pypi/botocore@1.43.69",
+      "purl": "pkg:pypi/botocore@1.43.74",
       "type": "library",
-      "version": "1.43.69"
+      "version": "1.43.74"
     },
     {
       "bom-ref": "certifi==2026.7.22",
@@ -306,7 +306,7 @@
       "version": "50.0.0"
     },
     {
-      "bom-ref": "django-mongodb-backend==6.1.0.dev0",
+      "bom-ref": "django-mongodb-backend==6.2.0.dev0",
       "description": "Django MongoDB Backend",
       "externalReferences": [
         {
@@ -344,8 +344,8 @@
       ],
       "name": "django-mongodb-backend",
       "type": "library",
-      "version": "6.1.0.dev0",
-      "purl": "pkg:pypi/django-mongodb-backend@6.1.0.dev0"
+      "version": "6.2.0.dev0",
+      "purl": "pkg:pypi/django-mongodb-backend@6.2.0.dev0"
     },
     {
       "bom-ref": "dnspython==2.8.0",
@@ -481,7 +481,7 @@
       "version": "0.28.1"
     },
     {
-      "bom-ref": "idna==3.18",
+      "bom-ref": "idna==3.19",
       "description": "Internationalized Domain Names in Applications (IDNA)",
       "externalReferences": [
         {
@@ -508,9 +508,9 @@
         }
       ],
       "name": "idna",
-      "purl": "pkg:pypi/idna@3.18",
+      "purl": "pkg:pypi/idna@3.19",
       "type": "library",
-      "version": "3.18"
+      "version": "3.19"
     },
     {
       "bom-ref": "jmespath==1.1.0",
@@ -754,7 +754,7 @@
       "version": "1.17.0"
     },
     {
-      "bom-ref": "sqlparse==0.5.5",
+      "bom-ref": "sqlparse==0.6.0",
       "description": "A non-validating SQL parser.",
       "externalReferences": [
         {
@@ -791,9 +791,9 @@
         }
       ],
       "name": "sqlparse",
-      "purl": "pkg:pypi/sqlparse@0.5.5",
+      "purl": "pkg:pypi/sqlparse@0.6.0",
       "type": "library",
-      "version": "0.5.5"
+      "version": "0.6.0"
     },
     {
       "bom-ref": "urllib3==2.7.0",
@@ -837,13 +837,13 @@
     {
       "dependsOn": [
         "asgiref==3.12.1",
-        "sqlparse==0.5.5"
+        "sqlparse==0.6.0"
       ],
       "ref": "Django==6.1"
     },
     {
       "dependsOn": [
-        "idna==3.18"
+        "idna==3.19"
       ],
       "ref": "anyio==4.14.2"
     },
@@ -852,11 +852,11 @@
     },
     {
       "dependsOn": [
-        "botocore==1.43.69",
+        "botocore==1.43.74",
         "jmespath==1.1.0",
         "s3transfer==0.19.2"
       ],
-      "ref": "boto3==1.43.69"
+      "ref": "boto3==1.43.74"
     },
     {
       "dependsOn": [
@@ -864,7 +864,7 @@
         "python-dateutil==2.9.0.post0",
         "urllib3==2.7.0"
       ],
-      "ref": "botocore==1.43.69"
+      "ref": "botocore==1.43.74"
     },
     {
       "ref": "certifi==2026.7.22"
@@ -886,14 +886,14 @@
         "Django==6.1",
         "pymongo==4.17.0"
       ],
-      "ref": "django-mongodb-backend==6.1.0.dev0"
+      "ref": "django-mongodb-backend==6.2.0.dev0"
     },
     {
       "dependsOn": [
         "cryptography==50.0.0",
         "httpcore==1.0.9",
         "httpx==0.28.1",
-        "idna==3.18"
+        "idna==3.19"
       ],
       "ref": "dnspython==2.8.0"
     },
@@ -913,12 +913,12 @@
         "anyio==4.14.2",
         "certifi==2026.7.22",
         "httpcore==1.0.9",
-        "idna==3.18"
+        "idna==3.19"
       ],
       "ref": "httpx==0.28.1"
     },
     {
-      "ref": "idna==3.18"
+      "ref": "idna==3.19"
     },
     {
       "ref": "jmespath==1.1.0"
@@ -931,8 +931,8 @@
     },
     {
       "dependsOn": [
-        "boto3==1.43.69",
-        "botocore==1.43.69",
+        "boto3==1.43.74",
+        "botocore==1.43.74",
         "dnspython==2.8.0",
         "pymongo==4.17.0"
       ],
@@ -966,7 +966,7 @@
     },
     {
       "dependsOn": [
-        "botocore==1.43.69"
+        "botocore==1.43.74"
       ],
       "ref": "s3transfer==0.19.2"
     },
@@ -974,14 +974,14 @@
       "ref": "six==1.17.0"
     },
     {
-      "ref": "sqlparse==0.5.5"
+      "ref": "sqlparse==0.6.0"
     },
     {
       "ref": "urllib3==2.7.0"
     }
   ],
   "metadata": {
-    "timestamp": "2026-08-12T15:19:48.243129+00:00",
+    "timestamp": "2026-08-19T17:04:52.654773+00:00",
     "tools": {
       "components": [
         {
@@ -1078,12 +1078,12 @@
           ],
           "name": "cyclonedx-python-lib",
           "type": "library",
-          "version": "11.11.2"
+          "version": "11.12.0"
         }
       ]
     }
   },
-  "serialNumber": "urn:uuid:7d4e42c2-7c77-40de-9ef2-38e4c3ce3826",
+  "serialNumber": "urn:uuid:136d2c30-625f-4299-98b9-3f9398d791f2",
   "version": 1,
   "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
   "bomFormat": "CycloneDX",

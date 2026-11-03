@@ -48,7 +48,7 @@
       "version": "6.1.2"
     },
     {
-      "bom-ref": "anyio==4.15.1",
+      "bom-ref": "anyio==4.16.0",
       "description": "High-level concurrency and networking framework on top of asyncio or Trio",
       "externalReferences": [
         {
@@ -80,9 +80,9 @@
         }
       ],
       "name": "anyio",
-      "purl": "pkg:pypi/anyio@4.15.1",
+      "purl": "pkg:pypi/anyio@4.16.0",
       "type": "library",
-      "version": "4.15.1"
+      "version": "4.16.0"
     },
     {
       "bom-ref": "asgiref==3.13.0",
@@ -122,7 +122,7 @@
       "version": "3.13.0"
     },
     {
-      "bom-ref": "boto3==1.43.121",
+      "bom-ref": "boto3==1.43.123",
       "description": "The AWS SDK for Python (Boto3)",
       "externalReferences": [
         {
@@ -149,12 +149,12 @@
         }
       ],
       "name": "boto3",
-      "purl": "pkg:pypi/boto3@1.43.121",
+      "purl": "pkg:pypi/boto3@1.43.123",
       "type": "library",
-      "version": "1.43.121"
+      "version": "1.43.123"
     },
     {
-      "bom-ref": "botocore==1.43.121",
+      "bom-ref": "botocore==1.43.123",
       "description": "Low-level, data-driven core of boto 3.",
       "externalReferences": [
         {
@@ -177,9 +177,9 @@
           "value": "crt"
         }
       ],
-      "purl": "pkg:pypi/botocore@1.43.121",
+      "purl": "pkg:pypi/botocore@1.43.123",
       "type": "library",
-      "version": "1.43.121"
+      "version": "1.43.123"
     },
     {
       "bom-ref": "certifi==2026.10.23",
@@ -343,7 +343,7 @@
       "purl": "pkg:pypi/django-mongodb-backend@6.1.1.dev0"
     },
     {
-      "bom-ref": "dnspython==2.9.0",
+      "bom-ref": "dnspython==2.9.1",
       "description": "DNS toolkit",
       "externalReferences": [
         {
@@ -375,9 +375,9 @@
         }
       ],
       "name": "dnspython",
-      "purl": "pkg:pypi/dnspython@2.9.0",
+      "purl": "pkg:pypi/dnspython@2.9.1",
       "type": "library",
-      "version": "2.9.0"
+      "version": "2.9.1"
     },
     {
       "bom-ref": "h11==0.16.0",
@@ -749,7 +749,7 @@
       "version": "1.17.0"
     },
     {
-      "bom-ref": "sqlparse==0.6.0",
+      "bom-ref": "sqlparse==0.6.1",
       "description": "A non-validating SQL parser.",
       "externalReferences": [
         {
@@ -786,9 +786,9 @@
         }
       ],
       "name": "sqlparse",
-      "purl": "pkg:pypi/sqlparse@0.6.0",
+      "purl": "pkg:pypi/sqlparse@0.6.1",
       "type": "library",
-      "version": "0.6.0"
+      "version": "0.6.1"
     },
     {
       "bom-ref": "urllib3==2.8.0",
@@ -837,7 +837,7 @@
     {
       "dependsOn": [
         "asgiref==3.13.0",
-        "sqlparse==0.6.0"
+        "sqlparse==0.6.1"
       ],
       "ref": "Django==6.1.2"
     },
@@ -845,7 +845,7 @@
       "dependsOn": [
         "idna==3.20"
       ],
-      "ref": "anyio==4.15.1"
+      "ref": "anyio==4.16.0"
     },
     {
       "dependsOn": [
@@ -855,11 +855,11 @@
     },
     {
       "dependsOn": [
-        "botocore==1.43.121",
+        "botocore==1.43.123",
         "jmespath==1.1.0",
         "s3transfer==0.19.3"
       ],
-      "ref": "boto3==1.43.121"
+      "ref": "boto3==1.43.123"
     },
     {
       "dependsOn": [
@@ -867,7 +867,7 @@
         "python-dateutil==2.9.0.post0",
         "urllib3==2.8.0"
       ],
-      "ref": "botocore==1.43.121"
+      "ref": "botocore==1.43.123"
     },
     {
       "ref": "certifi==2026.10.23"
@@ -896,14 +896,14 @@
         "cryptography==50.0.2",
         "idna==3.20"
       ],
-      "ref": "dnspython==2.9.0"
+      "ref": "dnspython==2.9.1"
     },
     {
       "ref": "h11==0.16.0"
     },
     {
       "dependsOn": [
-        "anyio==4.15.1",
+        "anyio==4.16.0",
         "certifi==2026.10.23",
         "h11==0.16.0"
       ],
@@ -911,7 +911,7 @@
     },
     {
       "dependsOn": [
-        "anyio==4.15.1",
+        "anyio==4.16.0",
         "certifi==2026.10.23",
         "httpcore==1.0.9",
         "idna==3.20"
@@ -932,9 +932,9 @@
     },
     {
       "dependsOn": [
-        "boto3==1.43.121",
-        "botocore==1.43.121",
-        "dnspython==2.9.0",
+        "boto3==1.43.123",
+        "botocore==1.43.123",
+        "dnspython==2.9.1",
         "pymongo==4.19.0"
       ],
       "ref": "pymongo-auth-aws==1.3.0"
@@ -943,7 +943,7 @@
       "dependsOn": [
         "certifi==2026.10.23",
         "cryptography==50.0.2",
-        "dnspython==2.9.0",
+        "dnspython==2.9.1",
         "pymongo-auth-aws==1.3.0",
         "pymongocrypt==1.21.2"
       ],
@@ -967,7 +967,7 @@
     },
     {
       "dependsOn": [
-        "botocore==1.43.121"
+        "botocore==1.43.123"
       ],
       "ref": "s3transfer==0.19.3"
     },
@@ -975,14 +975,14 @@
       "ref": "six==1.17.0"
     },
     {
-      "ref": "sqlparse==0.6.0"
+      "ref": "sqlparse==0.6.1"
     },
     {
       "ref": "urllib3==2.8.0"
     }
   ],
   "metadata": {
-    "timestamp": "2026-10-29T00:16:19.797142+00:00",
+    "timestamp": "2026-11-03T13:12:38.509833+00:00",
     "tools": {
       "components": [
         {
@@ -1084,7 +1084,7 @@
       ]
     }
   },
-  "serialNumber": "urn:uuid:6bec4c44-a05b-4b80-a69e-0d09a4656cec",
+  "serialNumber": "urn:uuid:cb6c8812-8ceb-4ad6-8478-8a0f01727828",
   "version": 1,
   "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
   "bomFormat": "CycloneDX",
